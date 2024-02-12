@@ -17,22 +17,24 @@ export default function Home({navigation}) {
   const [distance, setDistance] = useState(null);
   const [duration, setDuration] = useState(null);
   const [steps, setSteps] = useState(null);
-  const [currOrder, setCurrOrder] = useState(null)
+  const [currOrder, setCurrOrder] = useState(null);
+  const [currLoc, setCurrLoc] = useState(null);
+  const [pitch, setPitch] = useState(0);
+  const [zoom, setZoom] = useState(15);
 
   const getCurrentLocation = async () => {
-    setLocation(null);
+    setLocation(null)
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       alert('Permission to access location was denied');
-      currentOrder();
+      getCurrentOrder();
     }
     let location = await Location.getCurrentPositionAsync({});
+    console.log(location);
     setLocation(location);
     if(mapPoints.length === 0) {
       setMapPoints(oldArray => [...oldArray, {long: location.coords.longitude, lat: location.coords.latitude}])
-      currentOrder();
-    } else {
-      currentOrder();
+      getCurrentOrder();
     }
   }
   const toHoursAndMinutes = (totalSeconds) => {
@@ -44,7 +46,7 @@ export default function Home({navigation}) {
   
     return  `${hours} hr ${minutes} min ${seconds} sec`; // { h: hours, m: minutes, s: seconds }
   }
-  const currentOrder = () => {
+  const getCurrentOrder = () => {
     try {
         fetch(`${BASE_URL}rider/current-order`, {
             method: 'GET',
@@ -118,6 +120,7 @@ export default function Home({navigation}) {
             })
           })
           setSteps(step_instructions);
+          setPitch(60);
         })
       } catch (e) {
           console.log(e);
@@ -125,9 +128,51 @@ export default function Home({navigation}) {
     }
   }
 
+  const completeOrder = () => {
+    //console.log(currOrder);
+    try {
+      fetch(`${BASE_URL}transaction/complete-order`, {
+          method: 'POST',
+          headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${userInfo.token}`
+          },
+          body: JSON.stringify({
+            order_no: currOrder[0].order_no
+          })
+      })
+      .then(processResponse)
+      .then(res => {
+          const {statusCode, data} = res;
+          console.log(statusCode);
+          console.log(data);
+          getCurrentOrder();
+          setLineString(null);
+          setDistance(null);
+          setDuration(null);
+          setSteps(null);
+          setPitch(0);
+      })
+    } catch (e) {
+        console.log(e);
+    }
+  }
+
   useEffect(() => {
-    getCurrentLocation();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      setMapPoints([]);
+      getCurrentLocation();
+      Location.watchPositionAsync({
+        accuracy: Location.Accuracy.Highest,
+        distanceInterval: 1,
+        timeInterval: 1000,
+      }, (loc) => {
+          setCurrLoc(loc);
+      })
+    })
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
@@ -139,18 +184,22 @@ export default function Home({navigation}) {
         scaleBarEnabled={false}
       >
         <Mapbox.UserLocation
-            //androidRenderMode='gps'
+            androidRenderMode='gps'
             renderMode={UserLocationRenderMode.Native}
             visible={true}
             requestsAlwaysUse={true}
         />
-        {location &&
+        {location !== null || currLoc !== null ?
           <Mapbox.Camera
-            zoomLevel={17}
-            centerCoordinate={[location.coords.longitude, location.coords.latitude]}
+            zoomLevel={zoom}
+            centerCoordinate={currLoc ? [currLoc.coords.longitude, currLoc.coords.latitude] : [location.coords.longitude, location.coords.latitude]}
             animationMode='flyTo'
             animationDuration={2000}
+            pitch={pitch}
+            heading={currLoc ? currLoc.coords.heading : 0}
           />
+          :
+          null
         }
         {mapPoints.length > 0 && lineString !== null ?
             mapPoints.map((item, index) => {
@@ -203,43 +252,72 @@ export default function Home({navigation}) {
         </TouchableOpacity>
         }
       </View>
-      <View style={{padding: 10, position: 'absolute', bottom: mapPoints !== null && lineString !== null ? (window_height * 0.3 + 10) : 10, width: '100%', justifyContent: 'flex-end', flexDirection: 'row'}}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={{
-            backgroundColor: '#fff',
-            elevation: 5,
-            width: 70,
-            height: 70,
-            borderRadius: 35,
-            padding: 15,
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-          onPress={() => getCurrentLocation()}
-        >
-          <Image source={require('../../../assets/location-crosshairs.png')} style={{width: '100%', height: '100%', resizeMode: 'contain', tintColor: '#99DFB2'}}/>
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={{
-            backgroundColor: '#fff',
-            elevation: 5,
-            width: 70,
-            height: 70,
-            borderRadius: 35,
-            padding: 15,
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginLeft: 10
-          }}
-          onPress={() => getDirections()}
-        >
-          <Image source={require('../../../assets/diamond-turn-right.png')} style={{width: '100%', height: '100%', resizeMode: 'contain', tintColor: '#99DFB2'}}/>
-        </TouchableOpacity>
+      <View style={{padding: 10, position: 'absolute', bottom: mapPoints !== null && lineString !== null ? (window_height * 0.3 + 10 + 40 + 20 + 12) : 10, width: '100%', alignItems: 'flex-end'}}>
+        {location !== null || currLoc !== null  ?
+          <View style={{marginBottom: 30}}>
+            <TouchableOpacity
+              style={{width: 50, height: 50, borderRadius: 25, elevation: 5, backgroundColor: '#fff', marginBottom: 10, padding: 10}}
+              onPress={() => {
+                if(zoom < 20) {
+                  setZoom(zoom + 1);
+                }
+              }}
+            >
+              <Image source={require('../../../assets/plus-small.png')} style={{width: '100%', height: '100%', resizeMode: 'contain'}}/>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{width: 50, height: 50, borderRadius: 25, elevation: 5, backgroundColor: '#fff', marginBottom: 10, padding: 10}}
+              onPress={() => {
+                if(zoom > 0) {
+                  setZoom(zoom - 1);
+                }
+              }}
+            >
+              <Image source={require('../../../assets/minus-small.png')} style={{width: '100%', height: '100%', resizeMode: 'contain'}}/>
+            </TouchableOpacity>
+          </View>
+          :
+          null
+        }
+        <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={{
+              backgroundColor: '#fff',
+              elevation: 5,
+              width: 70,
+              height: 70,
+              borderRadius: 35,
+              padding: 15,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onPress={() => getCurrentLocation()}
+          >
+            <Image source={require('../../../assets/location-crosshairs.png')} style={{width: '100%', height: '100%', resizeMode: 'contain', tintColor: '#99DFB2'}}/>
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={{
+              backgroundColor: '#fff',
+              elevation: 5,
+              width: 70,
+              height: 70,
+              borderRadius: 35,
+              padding: 15,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginLeft: 10
+            }}
+            onPress={() => getDirections()}
+          >
+            <Image source={require('../../../assets/diamond-turn-right.png')} style={{width: '100%', height: '100%', resizeMode: 'contain', tintColor: '#99DFB2'}}/>
+          </TouchableOpacity>
+        </View>
       </View>
       {mapPoints !== null && lineString !== null ?
-          <View style={{position: 'absolute', bottom: 10, left: 10, right: 10, height: window_height * 0.3}}>
+          <View style={{position: 'absolute', bottom: 10, left: 10, right: 10}}>
+            <View style={{height: window_height * 0.3, marginBottom: 10}}>
               <View style={{backgroundColor: '#23262d', height: window_height * 0.3, elevation: 5, padding: 10, borderRadius: 5}}>
                   <View style={{backgroundColor: '#393c42', padding: 10, alignItems: 'center', borderRadius: 5, marginBottom: 10, flexDirection: 'row'}}>
                       <View style={{width: 50, height: 50, borderRadius: 25, backgroundColor: '#fff', padding: 10}}>
@@ -260,6 +338,15 @@ export default function Home({navigation}) {
                       }
                   </View>
               </View>
+            </View>
+            <View>
+              <TouchableOpacity
+                style={{backgroundColor: '#79AC78', padding: 20, alignItems: 'center', borderRadius: 5}}
+                onPress={() => completeOrder()}
+              >
+                <Text style={{color: '#fff'}}>Marked as Delivered</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         :
           null

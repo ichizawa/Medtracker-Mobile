@@ -7,6 +7,7 @@ import { format } from 'date-fns'
 export default function NewOrders({navigation}) {
     const {userInfo} = useContext(AuthContext);
     const [newOrders, setNewOrders] = useState(null);
+    const [isFetching, setIsFetching] = useState(false);
 
     const getNewOrders = () => {
         try {
@@ -21,8 +22,8 @@ export default function NewOrders({navigation}) {
             .then(processResponse)
             .then(res => {
                 const {statusCode, data} = res;
-                console.log(data.new_order);
-                setNewOrders(data.new_order)
+                setNewOrders(data.new_order);
+                setIsFetching(false);
             })
         } catch (e) {
             console.log(e);
@@ -78,6 +79,8 @@ export default function NewOrders({navigation}) {
                     <FlatList
                         data={newOrders}
                         extraData={newOrders}
+                        onRefresh={() => getNewOrders()}
+                        refreshing={isFetching}
                         renderItem={({item}) => {
                             return (
                                 <TouchableOpacity

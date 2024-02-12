@@ -47,7 +47,25 @@ export default function More({navigation}) {
                         underlayColor={'#fff'}
                         activeOpacity={0.2}
                         style={styles.menu_options}
-                        onPress={() => navigation.navigate('ClientPoints')}
+                        onPress={() => navigation.navigate('PrivacyPolicy')}
+                    >
+                        <Text>Privacy Policy</Text>
+                    </TouchableHighlight>
+                    <TouchableHighlight
+                        underlayColor={'#fff'}
+                        activeOpacity={0.2}
+                        style={styles.menu_options}
+                        onPress={() => navigation.navigate('TermsAndConditions')}
+                    >
+                        <Text>Terms & Conditions</Text>
+                    </TouchableHighlight>
+                </View>
+                <View style={styles.menu_options_container}>
+                    <TouchableHighlight
+                        underlayColor={'#fff'}
+                        activeOpacity={0.2}
+                        style={styles.menu_options}
+                        onPress={() => alert('Being worked on.')}
                     >
                         <Text>Points Wallet</Text>
                     </TouchableHighlight>

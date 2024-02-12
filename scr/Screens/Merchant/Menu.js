@@ -95,17 +95,17 @@ export default function Menu({navigation}) {
                         underlayColor={'#fff'}
                         activeOpacity={0.2}
                         style={styles.menu_options}
-                        onPress={() => console.log('pressed')}
+                        onPress={() => navigation.navigate('PrivacyPolicy')}
                     >
-                        <Text>T&C</Text>
+                        <Text>Privacy Policy</Text>
                     </TouchableHighlight>
                     <TouchableHighlight
                         underlayColor={'#fff'}
                         activeOpacity={0.2}
                         style={styles.menu_options}
-                        onPress={() => console.log('pressed')}
+                        onPress={() => navigation.navigate('TermsAndConditions')}
                     >
-                        <Text>Contact Us</Text>
+                        <Text>Terms And Conditions</Text>
                     </TouchableHighlight>
                 </View>
                 <View style={styles.menu_options_container}>

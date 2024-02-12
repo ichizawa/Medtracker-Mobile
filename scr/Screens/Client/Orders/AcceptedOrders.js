@@ -98,7 +98,7 @@ export default function AcceptedOrders({navigation}) {
                                     {item.payment_method === 'COP' &&
                                         <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 10, justifyContent: 'space-between', marginTop: 20, justifyContent: 'flex-end'}}>
                                             <TouchableOpacity
-                                                style={{paddingHorizontal:20, paddingVertical: 10, backgroundColor: '#79AC78', borderRadius: 5, flexDirection: 'row'}}
+                                                style={{paddingHorizontal:20, paddingVertical: 10, backgroundColor: '#79AC78', borderRadius: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}
                                                 onPress={() => navigation.navigate('GetOrderDirections', {order_details: item})}
                                                 //onPress={() => console.log(item)}
                                             >

@@ -40,7 +40,7 @@ export default function EditItem({route, navigation}) {
     }
     const getCategories = () => {
         try {
-            fetch(`${BASE_URL}categories-list`, {
+            fetch(`${BASE_URL}category-list`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

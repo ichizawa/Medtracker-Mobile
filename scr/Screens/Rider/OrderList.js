@@ -21,7 +21,7 @@ export default function OrderList({navigation}) {
         .then(processResponse)
         .then(res => {
             const {statusCode, data} = res;
-            console.log(data.accepted_order);
+            console.log(data.accepted_order)
             setOrders(data.accepted_order)
         })
     } catch (e) {
@@ -49,9 +49,13 @@ export default function OrderList({navigation}) {
     }
   }
   const getTotal = (items) => {
+    //console.log(items);
     let total = 0
-    items[0].items.map((product) => {
-        total += parseFloat(product.transaction_price)
+    items.map((merchant) => {
+      merchant.items.map((item) => {
+        //console.log(item.transaction_price);
+        total += parseFloat(item.transaction_price)
+      })
     })
     return total.toFixed(2);
   }

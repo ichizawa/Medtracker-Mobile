@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView, Button } from 'react-native'
 import React from 'react'
 import { format } from 'date-fns'
 
@@ -27,6 +27,7 @@ export default function OrderDetails({route, navigation}) {
             <ScrollView>
                 {order_details &&
                     order_details.order.map((item, index) => {
+                        console.log(item);
                         return (
                             <View key={index} style={{borderBottomWidth: 5, borderColor: '#f2f2f2'}}>
                                 <View style={{flexDirection: 'row', padding: 10}}>
@@ -57,6 +58,18 @@ export default function OrderDetails({route, navigation}) {
                     })
                 }
             </ScrollView>
+            {order_details.payment_method === 'COP' &&
+                <View style={{padding: 20}}>
+                    <TouchableOpacity
+                        style={{paddingHorizontal:20, paddingVertical: 10, backgroundColor: '#79AC78', borderRadius: 5, flexDirection: 'row'}}
+                        onPress={() => navigation.navigate('GetOrderDirections', {order_details: item})}
+                        //onPress={() => console.log(item)}
+                    >
+                        <Image source={require('../../../../assets/diamond-turn-right.png')} style={{width: 20, height: 20, tintColor: '#fff', marginRight: 10, resizeMode: 'contain'}}/>
+                        <Text style={{color: '#fff'}}>Get Directions</Text>
+                    </TouchableOpacity>
+                </View>
+            }
         </View>
     )
 }

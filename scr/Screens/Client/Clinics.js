@@ -63,8 +63,6 @@ export default function Clinics() {
           <View>
             {pharmacyList.length > 0 ?
                     pharmacyList.map((item, index) => {
-                        console.log(item)
-                        console.log(index);
                         return (
                             <View key={index} style={{padding: 10, marginBottom: 10, backgroundColor: '#fff', elevation: 5, borderRadius: 5}}>
                                 <View style={{flexDirection: 'row', flex: 1, marginBottom: 10}}>

@@ -77,6 +77,24 @@ export default function Menu({navigation}) {
                     underlayColor={'#fff'}
                     activeOpacity={0.2}
                     style={styles.menu_options}
+                    onPress={() => navigation.navigate('PrivacyPolicy')}
+                >
+                    <Text>Privacy Policy</Text>
+                </TouchableHighlight>
+                <TouchableHighlight
+                    underlayColor={'#fff'}
+                    activeOpacity={0.2}
+                    style={styles.menu_options}
+                    onPress={() => navigation.navigate('TermsAndConditions')}
+                >
+                    <Text>Terms And Conditions</Text>
+                </TouchableHighlight>
+            </View>
+            <View style={styles.menu_options_container}>
+                <TouchableHighlight
+                    underlayColor={'#fff'}
+                    activeOpacity={0.2}
+                    style={styles.menu_options}
                     onPress={() => console.log('pressed')}
                 >
                     <Text>Contact Us</Text>

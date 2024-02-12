@@ -20,16 +20,19 @@ export default function GetOrderDirections({route, navigation}) {
     const [duration, setDuration] = useState(null);
     const [mode, setMode] = useState('driving'); //driving, walking, cycling, traffic
     const [steps, setSteps] = useState(null);
+    const [currLoc, setCurrLoc] = useState(null);
+    const [pitch, setPitch] = useState(0);
 
     const getCurrentLocation = async () => {
         setLocation(null);
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-        alert('Permission to access location was denied');
+            alert('Permission to access location was denied');
         }
+
         let location = await Location.getCurrentPositionAsync({});
         setLocation(location);
-        //console.log(location.coords);
+        console.log(location)
         if(mapPoints.length === 0) {
             setMapPoints(oldArray => [...oldArray, {long: location.coords.longitude, lat: location.coords.latitude}])
             getStorePoints()
@@ -84,7 +87,7 @@ export default function GetOrderDirections({route, navigation}) {
                   })
                 })
                 setSteps(step_instructions);
-                //
+                setPitch(60);
             })
           } catch (e) {
               console.log(e);
@@ -98,10 +101,17 @@ export default function GetOrderDirections({route, navigation}) {
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
       
-        return  `${hours} hr ${minutes} min ${seconds} sec`; // { h: hours, m: minutes, s: seconds }
+        return  `${hours} hr ${minutes} min ${seconds} sec` // { h: hours, m: minutes, s: seconds }
     }
     useEffect(() => {
         getCurrentLocation();
+        Location.watchPositionAsync({
+            accuracy: Location.Accuracy.Highest,
+            distanceInterval: 1,
+            timeInterval: 1000,
+        }, (loc) => {
+            setCurrLoc(loc);
+        })
     }, [])
     return (
         <View style={styles.container}>
@@ -112,18 +122,14 @@ export default function GetOrderDirections({route, navigation}) {
                 attributionEnabled={false}
                 scaleBarEnabled={false}
             >
-                <Mapbox.UserLocation
-                    //androidRenderMode='gps'
-                    renderMode={UserLocationRenderMode.Native}
-                    visible={true}
-                    requestsAlwaysUse={true}
-                />
                 {location &&
                 <Mapbox.Camera
-                    zoomLevel={17}
-                    centerCoordinate={[location.coords.longitude, location.coords.latitude]}
+                    zoomLevel={20}
+                    centerCoordinate={currLoc ? [currLoc.coords.longitude, currLoc.coords.latitude] : [location.coords.longitude, location.coords.latitude]}
                     animationMode='flyTo'
                     animationDuration={2000}
+                    pitch={pitch}
+                    heading={currLoc ? currLoc.coords.heading : 0}
                 />
                 }
                 {mapPoints.length > 0 && lineString !== null?
@@ -140,17 +146,23 @@ export default function GetOrderDirections({route, navigation}) {
                         null
                 }
                 {lineString &&
-                <Mapbox.ShapeSource id='mapbox-direction-source' shape={lineString}>
-                    <Mapbox.LineLayer
-                    id="mapbox-direction-line"
-                    style={{
-                        lineColor: '#FF0000',
-                        lineWidth: 5,
-                        lineOpacity: 0.5
-                    }}
-                    />
-                </Mapbox.ShapeSource>
+                    <Mapbox.ShapeSource id='mapbox-direction-source' shape={lineString}>
+                        <Mapbox.LineLayer
+                        id="mapbox-direction-line"
+                        style={{
+                            lineColor: '#FF0000',
+                            lineWidth: 5,
+                            lineOpacity: 0.5
+                        }}
+                        />
+                    </Mapbox.ShapeSource>
                 }
+                <Mapbox.UserLocation
+                    androidRenderMode='gps'
+                    renderMode={UserLocationRenderMode.Native}
+                    visible={true}
+                    requestsAlwaysUse={true}
+                />
             </Mapbox.MapView>
             <View style={{position: 'absolute', top: 10, left: 10}}>
                 <TouchableOpacity
@@ -176,7 +188,7 @@ export default function GetOrderDirections({route, navigation}) {
                     }}
                     onPress={() => getCurrentLocation()}
                 >
-                <Image source={require('../../../../assets/location-crosshairs.png')} style={{width: '100%', height: '100%', resizeMode: 'contain', tintColor: '#99DFB2'}}/>
+                    <Image source={require('../../../../assets/location-crosshairs.png')} style={{width: '100%', height: '100%', resizeMode: 'contain', tintColor: '#99DFB2'}}/>
                 </TouchableOpacity>
                 <TouchableOpacity
                     activeOpacity={0.8}
@@ -193,7 +205,7 @@ export default function GetOrderDirections({route, navigation}) {
                     }}
                     onPress={() => getDirections()}
                 >
-                <Image source={require('../../../../assets/diamond-turn-right.png')} style={{width: '100%', height: '100%', resizeMode: 'contain', tintColor: '#99DFB2'}}/>
+                    <Image source={require('../../../../assets/diamond-turn-right.png')} style={{width: '100%', height: '100%', resizeMode: 'contain', tintColor: '#99DFB2'}}/>
                 </TouchableOpacity>
             </View>
             {mapPoints !== null && lineString !== null ?

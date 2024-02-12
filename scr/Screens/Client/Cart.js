@@ -2,17 +2,21 @@ import { StyleSheet, Text, View, SafeAreaView, TextInput, TouchableOpacity, Imag
 import React, { useContext, useEffect, useState } from 'react'
 import { BASE_URL, processResponse } from '../../config'
 import { AuthContext } from '../../context/AuthContext'
+//alert('View uploaded prescription.')
 
 export default function Cart() {
     const {userInfo} = useContext(AuthContext);
     const [cartItem, setCartItem] = useState(null);
     const [paymentMethod, setPaymentMethod] = useState('COD');
-    const [orderType, setOrderType] = useState(null);
+    const [orderType, setOrderType] = useState('Delivery');
     const [serviceFee, setServiceFee] = useState(40.00);
     //const [mapPoints, setMapPoints] = useState([]);
-    const getCart = (payment_method) => {
+    const [storeFee, setStoreFee] = useState(0);
+    const [merchants, setMerchants] = useState([]);
+    const [prescriptionRequired, setPrescriptionRequired] = useState(0);
+    const getCart = async (payment_method) => {
         try {
-            fetch(`${BASE_URL}cart/cart-item`, {
+            await fetch(`${BASE_URL}cart/cart-item`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -23,9 +27,23 @@ export default function Cart() {
             .then(processResponse)
             .then(res => {
                 const {statusCode, data} = res;
+                let merchant_list = [];
                 if(statusCode === 200 && data.cart_items.length > 0) {
+                    //console.log(data.cart_items);
+                    data.cart_items.map((item) => {
+                        if(merchant_list.find(element => element === item.merchant_name) !== undefined) {
+                            console.log('1 record found');
+                        } else {
+                            merchant_list.push(item.merchant_name);
+                        }
+                        ////
+                        if(item.is_prescription_required) {
+                            setPrescriptionRequired(item.is_prescription_required);
+                        }
+                    })
+                    setMerchants(merchant_list);
                     setCartItem(data.cart_items);
-                    getStorePoints(data.cart_items, payment_method);
+                    getStorePoints(data.cart_items, payment_method, merchant_list);
                 } else {
                     setCartItem(null);
                 }
@@ -34,7 +52,7 @@ export default function Cart() {
             console.log(e);
         }
     }
-    const getStorePoints = (cart, payment_method) => {
+    const getStorePoints = (cart, payment_method, merchant_list) => {
         let map_points = [];
         cart.map((item) => {
             //console.log('stores: ' + item.long, item.lat);
@@ -44,9 +62,9 @@ export default function Cart() {
         //console.log('user: ' + userInfo.details.long, userInfo.details.lat);
         //setMapPoints(oldArray => [...oldArray, {long: userInfo.details.long, lat: userInfo.details.long}]);
         map_points.push({long: userInfo.details.long, lat: userInfo.details.lat});
-        getDistanceFee(map_points, payment_method);
+        getDistanceFee(map_points, payment_method, merchant_list);
     }
-    const getDistanceFee = (map_points, payment_method) => {
+    const getDistanceFee = async (map_points, payment_method, merchant_list) => {
         if(map_points.length > 0) {
             try {
                 map_points.map((item, index) => {
@@ -56,7 +74,7 @@ export default function Cart() {
                     points = points + '%3B' + item.long + '%2C' + item.lat //
                     }
                 })
-                fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${points}?alternatives=false&continue_straight=false&geometries=geojson&language=en&overview=full&steps=true&access_token=pk.eyJ1IjoicnVpbnplIiwiYSI6ImNrOTd0N3F2bjBpdjkzZnBha3FsZmk4NjcifQ.VprSZLmMu0zRldMobXT6Fg`, {
+                await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${points}?alternatives=false&continue_straight=false&geometries=geojson&language=en&overview=full&steps=true&access_token=pk.eyJ1IjoicnVpbnplIiwiYSI6ImNrOTd0N3F2bjBpdjkzZnBha3FsZmk4NjcifQ.VprSZLmMu0zRldMobXT6Fg`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -72,6 +90,10 @@ export default function Cart() {
                         if(distance > 3) {
                             let fee = (distance - 3) * 12;
                             fee += 40;
+                            merchant_list.map((item) => {
+                                console.log(item);
+                                fee += 10;
+                            })
                             setServiceFee(parseFloat(fee.toFixed(2)));
                         } else {
                             setServiceFee(40.00);
@@ -168,6 +190,7 @@ export default function Cart() {
                 const {statusCode, data} = res;
                 getCart(paymentMethod);
                 console.log(data)
+                setPrescriptionRequired(0);
             })
         } catch (e) {
             console.log(e);
@@ -175,7 +198,7 @@ export default function Cart() {
     }
     const getCurrentDateTime = () => {
         const date = new Date();
-        const dateToday = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:00`
+        const dateToday = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:00`
         return dateToday;
     }
     const ToggleButton = ({type, typeDescripton, typeSubDescription, activeColor, customStyle, orderType}) => {
@@ -274,31 +297,56 @@ export default function Cart() {
                     :
                         null
                 }
+                {merchants &&
+                    <Text>{merchants}</Text>
+                }
             </View>
             <View style={{
                 width: '100%',
-                backgroundColor: '#f1f2f3',
                 bottom: 0,
+                // shadowRadius: 5,
+                // shadowOffset: {
+                //     width: 0,
+                //     height: -3,
+                // },
+                // shadowColor: '#000000',
+                elevation: 10,
             }}>
-                <View style={{padding: 10}}>
+                {prescriptionRequired === 1 &&
+                    <View style={{backgroundColor: '#fff', flexDirection: 'row', padding: 10}}>
+                        <View style={{flexDirection: 'row', flex: 1, alignItems: 'center'}}>
+                            <Image source={require('../../../assets/file-prescription.png')} style={{resizeMode: 'contain', width: 30, height: 30, tintColor: '#2dc4f4'}}/>
+                            <Text style={{marginLeft: 10, fontWeight: 'bold'}}>Upload Prescription</Text>
+                        </View>
+                        <View style={{flexDirection: 'row', flex: 1, justifyContent: 'flex-end', alignItems: 'center'}}>
+                            <TouchableOpacity onPress={() => alert('View uploaded prescription.')}>
+                                <Image source={require('../../../assets/eye.png')} style={{resizeMode: 'contain', width: 25, height: 25, tintColor: '#2dc4f4'}}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => alert('Upload prescription.')} style={{marginLeft: 20}}>
+                                <Image source={require('../../../assets/note-medical.png')} style={{resizeMode: 'contain', width: 25, height: 25, tintColor: '#2dc4f4'}}/>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                }
+                <View style={{padding: 10, borderTopWidth: 1, borderColor: '#f3f3f3', backgroundColor: '#fff'}}>
                     <View style={{marginBottom: 10}}>
                         <Text  style={{fontSize: 18, fontWeight: 'bold'}}>Select Payment Method</Text>
                     </View>
                     <View style={{flexDirection: 'row'}}>
-                        <ToggleButton type={'COD'} activeColor={'#79AC78'} orderType={'Delivery'} typeDescripton='Cash On Delivery' typeSubDescription={'For Delivery'} customStyle={{borderWidth: 1, paddingHorizontal: 30, paddingVertical: 20, borderRadius: 5, marginRight: 10}}/>
-                        <ToggleButton type={'COP'} activeColor={'#79AC78'} orderType={'Pickup'} typeDescripton='Cash On Pickup' typeSubDescription={'For Pickup'} customStyle={{borderWidth: 1, paddingHorizontal: 30, paddingVertical: 20, borderRadius: 5}}/>
+                        <ToggleButton type={'COD'} activeColor={'#79AC78'} orderType={'Delivery'} typeDescripton='Cash On Delivery' typeSubDescription={'For Delivery'} customStyle={{borderWidth: 1, paddingHorizontal: 15, paddingVertical: 10, borderRadius: 5, marginRight: 10}}/>
+                        <ToggleButton type={'COP'} activeColor={'#79AC78'} orderType={'Pickup'} typeDescripton='Cash On Pickup' typeSubDescription={'For Pickup'} customStyle={{borderWidth: 1, paddingHorizontal: 15, paddingVertical: 10, borderRadius: 5}}/>
                     </View>
                 </View>
-                <View style={{borderTopWidth: 1, borderColor: '#b2b2b2'}}>
-                    <View style={{height: 50, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, justifyContent: 'space-between'}}>
+                <View style={{borderTopWidth: 1, borderColor: '#f3f3f3', backgroundColor: '#fff'}}>
+                    <View style={{height: 30, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, justifyContent: 'space-between'}}>
                         <Text style={{fontWeight: 'bold', color: '#b2b2b2'}}>Subtotal</Text>
-                        <Text style={{fontWeight: 'bold', fontSize: 16}}>{'\u20B1'}{getSubtotal()}</Text>
+                        <Text style={{fontSize: 16}}>{'\u20B1'}{getSubtotal()}</Text>
                     </View>
-                    <View style={{height: 50, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, justifyContent: 'space-between'}}>
+                    <View style={{height: 30, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, justifyContent: 'space-between'}}>
                         <Text style={{fontWeight: 'bold', color: '#b2b2b2'}}>Service Fee</Text>
-                        <Text style={{fontWeight: 'bold', fontSize: 16}}>{'\u20B1'}{getSubtotal() > 0 ? serviceFee.toFixed(2) : 0.00}</Text>
+                        <Text style={{fontSize: 16}}>{'\u20B1'}{getSubtotal() > 0 ? serviceFee.toFixed(2) : 0.00}</Text>
                     </View>
-                    <View style={{height: 50, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, justifyContent: 'space-between'}}>
+                    <View style={{height: 30, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, justifyContent: 'space-between'}}>
                         <Text style={{fontWeight: 'bold', color: '#b2b2b2'}}>Amount Payable</Text>
                         <Text style={{fontWeight: 'bold', fontSize: 16}}>{'\u20B1'}{getSubtotal() > 0 ? (parseFloat(getSubtotal()) + parseFloat(serviceFee.toFixed(2))).toFixed(2) : 0.00}</Text>
                     </View>

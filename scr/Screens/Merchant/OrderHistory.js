@@ -21,7 +21,7 @@ export default function OrderHistory() {
             .then(processResponse)
             .then(res => {
                 const {statusCode, data} = res;
-                //console.log(data.past_order);
+                console.log(data);
                 setPastOrders(data.past_order)
             })
         } catch (e) {

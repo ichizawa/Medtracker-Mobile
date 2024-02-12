@@ -22,6 +22,7 @@ export default function Home() {
         .then(res => {
             const {statusCode, data} = res;
             setCategoryList(data.product);
+            //console.log(data);
         })
         .catch((e) => console.log(e))
     } catch (e) {

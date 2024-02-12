@@ -33,7 +33,7 @@ export default function Profile({navigation}) {
         .then(processResponse)
         .then(res => {
             const {statusCode, data} = res;
-            console.log(data.result)
+            console.log(data)
             setFirstName(data.result.first_name);
             setLastName(data.result.last_name);
             setAddress(data.result.address);

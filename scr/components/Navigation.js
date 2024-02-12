@@ -24,6 +24,8 @@ import RiderProfile from '../Screens/Rider/Profile'
 import MerchantPoints from '../Screens/Merchant/Points'
 import RiderPoints from '../Screens/Rider/Points'
 import ClientPoints from '../Screens/Client/Points'
+import TermsAndConditions from '../Screens/TermsAndConditions'
+import PrivacyPolicy from '../Screens/PrivacyPolicy'
 
 const Stack = createNativeStackNavigator();
 
@@ -79,6 +81,8 @@ export default function Navigation() {
                             <Stack.Screen name='Register' component={Register} options={{headerShown: false}}/>
                         </>
                 }
+                <Stack.Screen name='TermsAndConditions' component={TermsAndConditions} options={{headerShown: false}}/>
+                <Stack.Screen name='PrivacyPolicy' component={PrivacyPolicy} options={{headerShown: false}}/>
             </Stack.Navigator>
         </NavigationContainer>
     )

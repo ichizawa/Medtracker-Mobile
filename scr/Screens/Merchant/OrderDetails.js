@@ -106,6 +106,15 @@ export default function OrderDetails({route, navigation}) {
                                             >
                                                 <Text style={{color: '#fff'}}>{product.item_status === 'Pending' ? 'Accept' : product.item_status}</Text>
                                             </TouchableOpacity>
+                                            {product.item_status === 'Pending' &&
+                                                <TouchableOpacity
+                                                    disabled={product.item_status === 'Pending' ? false : true}
+                                                    style={{paddingHorizontal:20, paddingVertical: 10, backgroundColor: product.item_status === 'Pending' ? '#ff0000' : '#b2b2b2', borderRadius: 5, flexDirection: 'row', marginLeft: 10}}
+                                                    onPress={() => alert('Being worked on.')}
+                                                >
+                                                    <Text style={{color: '#fff'}}>{product.item_status === 'Pending' ? 'Decline' : product.item_status}</Text>
+                                                </TouchableOpacity>
+                                            }
                                         </View>
                                     </View>
                                 )

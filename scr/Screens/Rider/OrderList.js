@@ -3,6 +3,8 @@ import React, {useEffect, useContext, useState} from 'react'
 import { BASE_URL, processResponse } from '../../config';
 import { AuthContext } from '../../context/AuthContext';
 import { format } from 'date-fns'
+import { LinearGradient } from 'expo-linear-gradient'
+import { StatusBar } from 'expo-status-bar';
 
 export default function OrderList({navigation}) {
   const {userInfo} = useContext(AuthContext);
@@ -61,12 +63,20 @@ export default function OrderList({navigation}) {
   }
   const color = (status) => {
       if(status === 'Pending') {
-          return '#f2be16'
+          return 'white'
       }
       if (status === 'Accepted') {
-          return '#5d60e6'
+          return 'white'
       }
   }
+  const bgcolor = (status) => {
+    if(status === 'Pending') {
+        return 'lightgrey'
+    }
+    if (status === 'Accepted') {
+        return 'green'
+    }
+}
   const formatDate = (dt) => {
       var date = new Date(dt);
       var formattedDate = format(date, "MMM do H:mma");
@@ -78,16 +88,27 @@ export default function OrderList({navigation}) {
   }, [])
   return (
     <View style={styles.container}>
+      <StatusBar hidden = {false} translucent = {true}/>
+      <LinearGradient
+                colors={['transparent','lightgreen']}
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    right: 0,
+                    left: 0
+                }}
+            />
       <View style={styles.header}>
         <TouchableOpacity
         activeOpacity={0.7}
         style={styles.menu_button}
         onPress={() => navigation.goBack()}
         >
-          <Image source={require('../../../assets/angle-left.png')} style={styles.menu_icon_left}/>
+        <Image source={require('../../../assets/angle-left.png')} style={styles.menu_icon_left}/>
         </TouchableOpacity>
-        <Text style={styles.header_title}>Available Orders</Text>
-        <View style={styles.menu_button}/>
+          <Text style={styles.header_title}>Available Orders</Text>
+          <View style={styles.menu_button}/>
       </View>
       <View style={{flex: 1}}>
       {orders ?
@@ -99,36 +120,39 @@ export default function OrderList({navigation}) {
                           <View style={styles.order_list_view}>
                               <View style={{flex: 1, flexDirection: 'row'}}>
                                   <View style={{flex: 1, flexDirection: 'row'}}>
-                                      <View style={{width: 35, height: 35, backgroundColor: 'red', borderRadius: 5}}>
+                                      {/* <View style={{width: 35, height: 35, backgroundColor: 'red', borderRadius: 5}}>
 
-                                      </View>
-                                      <View style={{justifyContent: 'space-between', paddingHorizontal: 10, flex: 1}}>
-                                          <Text style={{fontWeight: 'bold'}}>{item.customer_name}</Text>
+                                      </View> */}
+                                      <View style={{justifyContent: 'space-between', paddingHorizontal: 0, flex: 1}}>
+                                          <Text style={{fontWeight: 'bold', fontSize: 20, color: '#013237'}}>{item.customer_name}</Text>
                                           {/* <Text style={{color: '#b2b2b2', fontSize: 12}}>{Moment(item.order_created).format('Do MMM, h:mm a')}</Text> */}
-                                          <Text numberOfLines={1} ellipsizeMode='tail' style={{color: '#b2b2b2', fontSize: 12}}>{item.address}</Text>
+                                          <Text numberOfLines={1} ellipsizeMode='tail' style={{color: '#013237', fontSize: 12}}>{item.address}</Text>
                                       </View>
                                   </View>
                                   <View style={{paddingLeft: 20, alignItems: 'flex-end', justifyContent: 'space-between'}}>
-                                      <Text style={{color: color(item.status), fontWeight: 'bold', letterSpacing: 3}}>{item.status.toUpperCase()}</Text>
-                                      <Text style={{color: '#b2b2b2', fontSize: 12}}>{ '\u20B1' + getTotal(item.order)}</Text>
+                                      <Text style={[styles.status_heading,{backgroundColor: bgcolor(item.status), color: color(item.status), fontWeight: 'bold'}]}>{item.status.toUpperCase()}</Text>
+                                      {/* <Text style={{color: 'white', fontSize: 12, fontWeight: 'bold'}}>{ '\u20B1' + getTotal(item.order)}</Text> */}
                                   </View>
                               </View>
                               <View style={{flex: 1, flexDirection: 'row'}}>
-                                  <View style={{width: 35, height: '100%'}}/>
-                                  <View style={{justifyContent: 'space-between', paddingHorizontal: 10, flex: 1, paddingVertical: 6}}>
+                                  <View style={{width: 'auto', height: '100%'}}/>
+                                  <View style={{justifyContent: 'space-between', flex: 1, paddingVertical: 6}}>
                                       {item.order.map((order, index) => {
                                         return (
                                           <View key={index}>
-                                            <Text numberOfLines={1} ellipsizeMode='tail' style={{marginTop: 10, marginBottom: 5, fontWeight: 'bold'}}>{order.merchant_name}</Text>
+                                            <Text numberOfLines={1} ellipsizeMode='tail' style={{marginTop: 15, fontWeight: 'bold', color: '#013237'}}>{order.merchant_name}</Text>
                                             {order.items.map((item, i) => {
                                               return (
-                                                <Text key={i} numberOfLines={1} ellipsizeMode='tail' style={{marginVertical: 3}}>{item.product_name}</Text>
+                                                <Text key={i} numberOfLines={1} ellipsizeMode='tail' style={{marginVertical: 0, color: '#013237'}}>{item.product_name}</Text>
                                               )
                                             })}
                                           </View>
                                         )
                                       })}
                                   </View>
+                              </View>
+                              <View style={{alignItems: 'flex-end', marginVertical: 0}}>
+                                <Text style={{color: '#013237', fontSize: 14, fontWeight: 'bold'}}>Total Bll: { '\u20B1' + getTotal(item.order)}</Text>
                               </View>
                               <View style={{flex: 1, flexDirection: 'row', width: '100%', paddingTop: 10}}>
                                 <View style={{flex:1}}/>
@@ -138,12 +162,12 @@ export default function OrderList({navigation}) {
                                   style={{
                                       paddingHorizontal: 20,
                                       paddingVertical: 10,
-                                      borderRadius: 5,
-                                      backgroundColor: item.status === 'Accepted' ? '#5d60e6' : '#b2b2b2'
+                                      borderRadius: 10,
+                                      backgroundColor: item.status === 'Accepted' ? '#0766AD' : '#b2b2b2'
                                   }}
                                   onPress={() => takeOrder(item.order_no)}
                                 >
-                                    <Text style={{color: '#fff'}}>Take Order</Text>
+                                    <Text style={{color: '#fff', fontWeight: 'bold'}}>Take Order</Text>
                                 </TouchableOpacity>
                               </View>
                           </View>
@@ -161,6 +185,7 @@ export default function OrderList({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
     backgroundColor: '#fff',
   },
   header:{
@@ -172,7 +197,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderBottomWidth: 5,
-    borderBottomColor: '#f1f2f3'
+    borderBottomColor: '#f1f2f3',
+    paddingTop: '13%'
   },
   header_title: {
     fontSize: 18,
@@ -193,9 +219,22 @@ const styles = StyleSheet.create({
       resizeMode: 'contain',
   },
   order_list_view: {
-      width: '100%',
-      borderBottomWidth: 5,
-      borderBottomColor: '#f1f2f3',
+      // width: '100%',
+      // borderBottomWidth: 5,
+      // borderBottomColor: '#f1f2f3',
+      // padding: 20,
+      marginVertical: 10,
+      backgroundColor: '#C0E6BA',
       padding: 20,
+      // paddingBottom: -50,
+      marginHorizontal: 10,
+      borderRadius: 20,
+  },
+  status_heading: {
+    // backgroundColor: 'green',
+    borderRadius: 50, 
+    // padding: 'auto',
+    width: 100,
+    textAlign: 'center',
   }
 })

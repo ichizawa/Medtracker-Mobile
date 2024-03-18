@@ -3,6 +3,8 @@ import React, {useContext, useEffect, useState} from 'react'
 import { BASE_URL, processResponse } from '../../config'
 import { AuthContext } from '../../context/AuthContext'
 import * as ImagePicker from 'expo-image-picker'
+import { StatusBar } from 'expo-status-bar'
+import {FontAwesome} from '@expo/vector-icons'
 
 export default function Profile({navigation}) {
   const {userInfo} = useContext(AuthContext);
@@ -13,6 +15,12 @@ export default function Profile({navigation}) {
   const [address, setAddress] = useState('');
   const [image, setImage] = useState(null);
   const [editProfile, setEditProfile] = useState(false);
+
+  const [isFirstFocused, setFirstFocused] = useState(false);
+  const [isLastFocused, setLastFocused] = useState(false);
+  const [isPhoneFocused, setPhoneFocused] = useState(false);
+  const [isEmailFocused, setEmailFocused] = useState(false);
+  const [isAddressFocused, setAddressFocused] = useState(false);
 
   const getMyProfile = () => {
     try {
@@ -60,6 +68,7 @@ export default function Profile({navigation}) {
   }, [])
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar hidden = {false} translucent = {true}/>
       <View style={styles.header}>
           <TouchableOpacity
           underlayColor={'#fff'}
@@ -80,7 +89,72 @@ export default function Profile({navigation}) {
           </TouchableOpacity>
       </View>
       <ScrollView>
-        <View style={{borderBottomColor: '#f2f2f2', borderBottomWidth: 5, padding: 20}}>
+        <View style={[styles.inner_form]}>
+        <View style={[styles.profile_form]}>
+              <View style={[styles.profile_image]}>
+                {image ? 
+                  <Image source={{uri: image}} style={{width: '100%', height: '100%', borderRadius: 100, resizeMode: 'contain'}}/>
+                  :
+                  <View style={{width: '100%', height: '100%', borderRadius: 100, borderWidth: 3, borderColor: 'green'}}/>
+                }
+              </View>
+            <TouchableOpacity 
+                onPress={() => {
+                  pickImage()
+                }}
+                style={{flexDirection: 'row'}}>
+              <View style={{alignSelf: 'flex-end', justifyContent: 'center', marginLeft: '75%', marginBottom: '5%', position: 'absolute', backgroundColor: 'white', borderRadius: 100, padding: 5}}>
+                <FontAwesome name='camera' size={25}/>
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View style={{borderBottomColor: '#f2f2f2', borderBottomWidth: 5, padding: 20}}>
+            <View style={{paddingBottom: 20}}>
+              <Text style={{color: '#b2b2b2', fontSize: 20, fontWeight: 'bold'}}>Rider Info</Text>
+            </View>
+            <View style={{marginBottom: 20}}>
+              <View>
+                <Text style={{color: '#b2b2b2', fontWeight: 'bold'}}>First Name</Text>
+                <TextInput value={firstName} style={{borderWidth: 1.5,borderRadius: 10, borderColor: isFirstFocused ? 'green' : '#b2b2b2', fontSize: 18, paddingVertical: 10, paddingLeft: 10}} editable={false}
+                onFocus={() => setFirstFocused(true)}
+                onBlur={() => setFirstFocused(false)}/>
+              </View>
+            </View>
+            <View style={{marginBottom: 20}}>
+              <View>
+                <Text style={{color: '#b2b2b2', fontWeight: 'bold'}}>Last Name</Text>
+                <TextInput value={lastName} style={{borderWidth: 1.5,borderRadius: 10, borderColor: isLastFocused ? 'green' : '#b2b2b2', fontSize: 18, paddingVertical: 10, paddingLeft: 10}} editable={false}
+                onFocus={() => setLastFocused(true)}
+                onBlur={() => setLastFocused(false)}/>
+              </View>
+            </View>
+            <View style={{marginBottom: 20}}>
+              <View>
+                <Text style={{color: '#b2b2b2', fontWeight: 'bold'}}>Phone Number</Text>
+                <TextInput value={phoneNumber} style={{borderWidth: 1.5,borderRadius: 10, borderColor: isPhoneFocused ? 'green' : '#b2b2b2', fontSize: 18, paddingVertical: 10, paddingLeft: 10}} editable={false}
+                onFocus={() => setPhoneFocused(true)}
+                onBlur={() => setPhoneFocused(false)}/>
+              </View>
+            </View>
+            <View>
+              <View>
+                <Text style={{color: '#b2b2b2', fontWeight: 'bold'}}>Email</Text>
+                <TextInput value={email} style={{borderWidth: 1.5,borderRadius: 10, borderColor: isEmailFocused ? 'green' : '#b2b2b2', fontSize: 18, paddingVertical: 10, paddingLeft: 10}} editable={false}
+                onFocus={() => setEmailFocused(true)}
+                onBlur={() => setEmailFocused(false)}/>
+              </View>
+            </View>
+          </View>
+          <View style={{borderBottomColor: '#f2f2f2', borderBottomWidth: 5, padding: 20}}>
+            <View style={{paddingBottom: 20}}>
+              <Text style={{color: '#b2b2b2', fontSize: 20, fontWeight: 'bold'}}>Address</Text>
+            </View>
+            <TextInput value={address} selection={{start: 0, end: 0}} style={{borderWidth: 1.5,borderRadius: 10, borderColor: isAddressFocused ? 'green' : '#b2b2b2', fontSize: 18, paddingVertical: 10, paddingLeft: 10}} editable={false}
+            onFocus={() => setAddressFocused(true)}
+            onBlur={() => setAddressFocused(false)}/>
+          </View>
+        </View>
+        {/* <View style={{borderBottomColor: '#f2f2f2', borderBottomWidth: 5, padding: 20}}>
           <View style={{paddingBottom: 10}}>
             <Text style={{color: '#b2b2b2', fontSize: 20, fontWeight: 'bold'}}>Store Profile</Text>
           </View>
@@ -139,7 +213,7 @@ export default function Profile({navigation}) {
             <Text style={{color: '#b2b2b2', fontSize: 20, fontWeight: 'bold'}}>Address</Text>
           </View>
           <TextInput value={address} selection={{start: 0, end: 0}} style={{borderBottomWidth: 1, borderBottomColor: '#b2b2b2', fontSize: 20, paddingVertical: 10}} editable={false}/>
-        </View>
+        </View> */}
       </ScrollView>
       {editProfile === true &&
         <TouchableOpacity
@@ -170,6 +244,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomColor: '#f2f2f2',
     borderBottomWidth: 5,
+    paddingTop: '13%'
   },
   menu_button: {
     height: 20,
@@ -183,5 +258,21 @@ const styles = StyleSheet.create({
   header_title: {
     fontSize: 18,
     fontWeight: 'bold'
+  },
+  inner_form: {
+    flex: 1,
+    flexDirection: 'column',
+    height: '100%',
+    width: '100%'
+  },
+  profile_form: {
+    marginTop: '2%',
+    alignSelf: 'center',
+    padding: 10
+  },
+  profile_image: {
+    height: 150,
+    width: 150,
+    flexDirection: 'column'
   }
 })

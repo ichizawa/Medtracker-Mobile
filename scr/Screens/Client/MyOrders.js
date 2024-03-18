@@ -5,12 +5,15 @@ import PendingOrders from './Orders/PendingOrders'
 import AcceptedOrders from './Orders/AcceptedOrders'
 import CompletedOrders from './Orders/CompletedOrders'
 import CancelledOrders from './Orders/CancelledOrders'
+import { StatusBar } from 'expo-status-bar'
 
 const Tab = createMaterialTopTabNavigator();
 
 export default function MyOrders({navigation}) {
     return (
         <SafeAreaView style={styles.container}>
+          {/* <StatusBar></StatusBar> */}
+          <StatusBar hidden = {false} translucent = {true}/>
           <View style={styles.header}>
               <TouchableHighlight
               underlayColor={'#fff'}
@@ -25,10 +28,12 @@ export default function MyOrders({navigation}) {
           </View>
           <Tab.Navigator
               screenOptions={{
-                  tabBarActiveTintColor: '#99DFB2',
+                  tabBarActiveTintColor: 'darkgreen',
                   tabBarInactiveTintColor: '#808080',
                   tabBarIndicatorStyle: {
-                      height: 0
+                      // height: 0
+                      // borderColor: 'darkgreen'
+                      backgroundColor: 'darkgreen'
                   },
                   tabBarLabelStyle: {
                       textTransform: 'none',
@@ -52,7 +57,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    paddingTop: '15%',
+    // padding: 20,
   },
   header:{
     flexDirection: 'row',
@@ -74,7 +81,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain'
   },
   header_title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold'
   }
 })

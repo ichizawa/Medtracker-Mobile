@@ -4,6 +4,7 @@ import SelectDropdown from 'react-native-select-dropdown'
 import { BASE_URL, processResponse } from '../../config'
 import * as ImagePicker from 'expo-image-picker'
 import { AuthContext } from '../../context/AuthContext';
+import { StatusBar } from 'expo-status-bar';
 
 const window_width = Dimensions.get('window').width
 
@@ -19,6 +20,11 @@ export default function AddItem({navigation}) {
     const [productStock, setProductStock] = useState(null);
     const [image, setImage] = useState(null);
     
+    const [isProductNameFocussed, setProductNameFocused] = useState(false);
+    const [isDescFocussed, setDescFocussed] = useState(false);
+    const [isPriceFocussed, setPriceFocussed] = useState(false);
+    const [isQuantityFocussed, setQuantityFocussed] = useState(false);
+
     const pickImage = async () => {
         // No permissions request is necessary for launching the image library
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -36,7 +42,7 @@ export default function AddItem({navigation}) {
     }
     const getCategories = () => {
         try {
-            fetch(`${BASE_URL}categories-list`, {
+            fetch(`${BASE_URL}category-list`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -86,6 +92,7 @@ export default function AddItem({navigation}) {
     }, [])
     return (
         <View style={styles.container}>
+            <StatusBar hidden = {false} backgroundColor= 'white' translucent = {false} />
             <ScrollView  style={{flexGrow: 1, backgroundColor: '#fff'}} automaticallyAdjustKeyboardInsets={true}>
                 <View style={styles.header}>
                     <TouchableOpacity
@@ -145,23 +152,26 @@ export default function AddItem({navigation}) {
                                 onPress={() => pickImage()}
                             >
                                 <>
-                                    <Image source={require('../../../assets/circle-camera.png')} style={{width: 35, height: 35, tintColor: '#99DFB2', marginBottom: 10}}/>
-                                    <Text style={{fontWeight: 'bold', color: '#99DFB2'}}>Upload Image</Text>
+                                    <Image source={require('../../../assets/circle-camera.png')} style={{width: 35, height: 35, tintColor: '#4CA771', marginBottom: 10}}/>
+                                    <Text style={{fontWeight: 'bold', color: '#4CA771'}}>Upload Image</Text>
                                 </>
                             </TouchableOpacity>
                         </View>
                     </View>
                     <View style={styles.field_container}>
-                        <Text style={styles.input_label}>Product Name</Text>
-                        <TextInput style={styles.text_input} onChangeText={(e) => setProductName(e)} value={productName}/>
+                        <Text style={[styles.input_label, {color: isProductNameFocussed ? 'green' : '#b2b2b2'}]}>Product Name</Text>
+                        <TextInput style={[styles.text_input, {borderColor: isProductNameFocussed ? 'green' : '#f1f2f3'}]} 
+                        onFocus = {() => {setProductNameFocused(true)}}
+                        onBlur= {() => {setProductNameFocused(false)}}
+                        onChangeText={(e) => setProductName(e)} value={productName}/>
                     </View>
                     <View style={styles.field_container}>
                         <Text style={styles.input_label}>Item Category</Text>
                         <SelectDropdown
-                            buttonStyle={{height: 45, marginVertical: 15, width: '100%', borderRadius: 5, paddingHorizontal: 20}}
+                            buttonStyle={{height: 45, marginVertical: 15, width: '100%', borderRadius: 10, paddingHorizontal: 20}}
                             buttonTextStyle={{textAlign: 'left', color: '#000', fontSize: 14, marginLeft: 0}}
                             defaultButtonText='Select Category'
-                            dropdownStyle={{borderRadius: 5}}
+                            dropdownStyle={{borderRadius: 10}}
                             renderDropdownIcon={(isOpened) => {
                                 return (
                                     <Image source={isOpened ? require('../../../assets/angle-up.png') : require('../../../assets/angle-down.png')} style={{width: 15, height: 15}}/>
@@ -185,16 +195,25 @@ export default function AddItem({navigation}) {
                         />
                     </View>
                     <View style={styles.field_container}>
-                        <Text style={styles.input_label}>Description</Text>
-                        <TextInput style={styles.multiline_input} multiline={true} numberOfLines={5} value={productDescription} onChangeText={(e) => setProductDescription(e)}/>
+                        <Text style={[styles.input_label, {color: isDescFocussed ? 'green' : '#b2b2b2'}]}>Description</Text>
+                        <TextInput style={[styles.multiline_input, {borderColor: isDescFocussed ? 'green' : '#f1f2f3'}]} multiline={true} numberOfLines={5} value={productDescription} 
+                        onFocus = {() => {setDescFocussed(true)}}
+                        onBlur= {() => {setDescFocussed(false)}}
+                        onChangeText={(e) => setProductDescription(e)}/>
                     </View>
                     <View style={styles.field_container}>
-                        <Text style={styles.input_label}>Price</Text>
-                        <TextInput style={styles.text_input} value={productPrice} onChangeText={(e) => setProductPrice(e)}/>
+                        <Text style={[styles.input_label, {color: isPriceFocussed ? 'green' : '#b2b2b2'}]}>Price</Text>
+                        <TextInput style={[styles.text_input, {borderColor: isPriceFocussed ? 'green' : '#f1f2f3'}]} value={productPrice} 
+                        onFocus = {() => {setPriceFocussed(true)}}
+                        onBlur= {() => {setPriceFocussed(false)}}
+                        onChangeText={(e) => setProductPrice(e)}/>
                     </View>
                     <View style={styles.field_container}>
-                        <Text style={styles.input_label}>Quantity</Text>
-                        <TextInput style={styles.text_input} value={productStock} onChangeText={(e) => setProductStock(e)}/>
+                        <Text style={[styles.input_label, {color: isQuantityFocussed ? 'green' : '#b2b2b2'}]}>Quantity</Text>
+                        <TextInput style={[styles.text_input, {borderColor: isQuantityFocussed ? 'green' : '#f1f2f3'}]} value={productStock} 
+                        onFocus = {() => {setQuantityFocussed(true)}}
+                        onBlur= {() => {setQuantityFocussed(false)}}
+                        onChangeText={(e) => setProductStock(e)}/>
                     </View>
                     <View style={styles.prescription_container}>
                         <View style={{width: 50, height: 50}}>
@@ -216,7 +235,7 @@ export default function AddItem({navigation}) {
                 style={{
                     width: '100%',
                     height: 50,
-                    backgroundColor: '#585ce5',
+                    backgroundColor: '#4CA771',
                     alignItems: 'center',
                     justifyContent: 'center'
                 }}
@@ -242,6 +261,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         alignItems: 'center',
         justifyContent: 'space-between',
+        paddingTop: '5%'
     },
     menu_button: {
         height: 20,
@@ -291,7 +311,9 @@ const styles = StyleSheet.create({
         width: '100%',
         //height: 45,
         backgroundColor: '#f1f2f3',
-        borderRadius: 5,
+        borderColor: '#f1f2f3',
+        borderWidth: 1.5,
+        borderRadius: 10,
         marginVertical: 15,
         paddingHorizontal: 15,
         paddingVertical: 10
@@ -299,7 +321,9 @@ const styles = StyleSheet.create({
     multiline_input: {
         width: '100%',
         backgroundColor: '#f1f2f3',
-        borderRadius: 5,
+        borderColor: '#f1f2f3',
+        borderWidth: 1.5,
+        borderRadius: 10,
         marginVertical: 15,
         padding: 15,
         textAlignVertical: 'top'

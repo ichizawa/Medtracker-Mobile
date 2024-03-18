@@ -3,12 +3,14 @@ import React, {useEffect, useContext, useState} from 'react'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import NewOrders from './NewOrders';
 import OrderHistory from './OrderHistory';
+import { StatusBar } from 'expo-status-bar';
 
 const Tab = createMaterialTopTabNavigator();
 
 export default function Home({navigation}) {
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar hidden = {false} translucent = {true}/>
       <View style={styles.header}>
         <TouchableHighlight
           underlayColor={'#fff'}
@@ -23,19 +25,18 @@ export default function Home({navigation}) {
       </View>
       <Tab.Navigator
         screenOptions={{
-          tabBarActiveTintColor: '#99DFB2',
+          tabBarActiveTintColor: '#6EB95B',
           tabBarInactiveTintColor: '#808080',
           tabBarIndicatorStyle: {
-            height: 0
+            // height: 0
+            backgroundColor: '#6EB95B',
           },
           tabBarLabelStyle: {
             textTransform: 'none',
             fontWeight: 'bold',
             fontSize: 16
           }
-        }}
-        
-      >
+        }}>
         <Tab.Screen name="New Orders" component={NewOrders}/>
         <Tab.Screen name="Order History" component={OrderHistory}/>
       </Tab.Navigator>
@@ -47,7 +48,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    paddingTop: 20
   },
   header:{
     flexDirection: 'row',
@@ -57,6 +59,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     alignItems: 'center',
     justifyContent: 'space-between',
+    padding: '10%'
   },
   menu_button: {
     height: 25,
@@ -68,7 +71,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain'
   },
   header_title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold'
   }
 })

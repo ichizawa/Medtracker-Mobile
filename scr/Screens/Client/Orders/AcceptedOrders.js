@@ -3,6 +3,7 @@ import React, {useState, useEffect, useContext} from 'react'
 import { BASE_URL, processResponse } from '../../../config'
 import { AuthContext } from '../../../context/AuthContext'
 import { format } from 'date-fns'
+import { LinearGradient } from 'expo-linear-gradient'
 
 export default function AcceptedOrders({navigation}) {
     const {userInfo} = useContext(AuthContext);
@@ -48,40 +49,51 @@ export default function AcceptedOrders({navigation}) {
     }, [])
     return (
         <View style={styles.container}>
+            <LinearGradient
+                colors={['transparent','lightgreen']}
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    right: 0,
+                    left: 0
+                }}
+            />
             {acceptedOrders ?
                     <FlatList
+                        style={styles.inner_container}
                         data={acceptedOrders}
                         extraData={acceptedOrders}
                         renderItem={({item}) => {
                             return (
                                 <TouchableOpacity
-                                    style={styles.order_list_view}
+                                    style={[styles.order_list_view, styles.backdrop_shadow]}
                                     onPress={() => navigation.navigate('ClientOrderDetails', {order_details: item})}
                                 >
                                     <>
-                                    <View style={{flex: 1, flexDirection: 'row'}}>
+                                    <View style={styles.date_heading}>
                                         <View style={{flex: 1, flexDirection: 'row'}}>
-                                            <View style={{justifyContent: 'space-between', paddingHorizontal: 10, flex: 1}}>
+                                            <View style={{justifyContent: 'space-between', paddingHorizontal: 0, flex: 1}}>
                                                 {item.order.map((item, index) => {
                                                     return (
                                                         <Text style={{fontWeight: 'bold'}} numberOfLines={1} ellipsizeMode='tail' key={'merchant'+index}>{item.merchant_name}</Text>
                                                     )
                                                 })}
-                                                <Text style={{color: '#b2b2b2', fontSize: 12}}>{formatDate(item.order_created)}</Text>
+                                                <Text style={{color: '#4CA771', fontSize: 12}}>{formatDate(item.order_created)}</Text>
                                             </View>
                                         </View>
-                                        <View style={{paddingHorizontal: 10,alignItems: 'flex-end', justifyContent: 'space-between'}}>
-                                            <Text style={{color: '#5d60e6', fontWeight: 'bold', letterSpacing: 3}}>{item.status.toUpperCase()}</Text>
+                                        <View style={styles.order_upper_end_info}>
+                                            <Text style={[styles.order_upper_end_text, {color: 'white', fontWeight: 'bold'}]}>{item.status.toUpperCase()}</Text>
                                         </View>
                                     </View>
-                                    <View style={{flex: 1, flexDirection: 'row'}}>
-                                        <View style={{justifyContent: 'space-between', paddingHorizontal: 10, flex: 1, paddingVertical: 6}}>
+                                    <View style={styles.order_mid_info}>
+                                        <View style={styles.order_mid_end_info}>
                                             {item.order.map((product, index) => {
                                                 return (
                                                     <View key={'order'+index}>
                                                         {product.items.map((item, index) => {
                                                             return (
-                                                                <Text key={'product'+item.product_id} numberOfLines={1} ellipsizeMode='tail' style={{marginVertical: 3,color: '#b2b2b2', fontSize: 12}}>{item.product_name}</Text>
+                                                                <Text key={'product'+item.product_id} numberOfLines={1} ellipsizeMode='tail' style={{color: 'black', fontSize: 14, fontWeight: 'bold'}}>{item.product_name}</Text>
                                                             )
                                                         })}
                                                     </View>
@@ -89,9 +101,10 @@ export default function AcceptedOrders({navigation}) {
                                             })}
                                         </View>
                                     </View>
-                                    <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 10, justifyContent: 'flex-end', marginTop: 10}}>
-                                        <Text style={{fontSize: 14, marginRight: 10, color: '#b2b2b2'}}>Total Bill:</Text>
-                                        <Text style={{fontSize: 14, color: '#ff0000'}}>
+                                    
+                                    <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 10, justifyContent: 'flex-end', marginTop: 0}}>
+                                        <Text style={{fontSize: 14, marginRight: 10, color: 'black'}}>Total Bill:</Text>
+                                        <Text style={{fontSize: 14, color: '#013237'}}>
                                             { '\u20B1' + getTotal(item.order)}
                                         </Text>
                                     </View>
@@ -122,12 +135,67 @@ export default function AcceptedOrders({navigation}) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff'
+        // backgroundColor: '#fff',
+        flexDirection: 'column',
+        width: '100%',
+        alignItems: 'center',
+    },
+    inner_container: {
+        marginVertical: 10,
+        width: '100%',
+        // padding: 20
     },
     order_list_view: {
-        width: '100%',
-        borderBottomWidth: 5,
-        borderBottomColor: '#f1f2f3',
-        padding: 20
-    }
+        alignSelf: 'center',
+        flex: 1,
+        backgroundColor: '#C0E6BA',
+        width: '95%',
+        height: 170,
+        borderRadius: 10,
+        marginBottom: 25,
+        padding: 13
+    },
+    backdrop_shadow:{
+        elevation: 5,
+        shadowColor: '#52006A',
+    },
+    date_heading: {
+        flexDirection: 'row',
+        // flex: 1,
+        paddingBottom: 20,
+        // marginVertical: 20,
+        // backgroundColor: 'red'
+    },
+    center_heading: {
+        flex: 2, 
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        color: 'white'
+    },
+    order_upper_end_info: {
+        alignItems: 'flex-end',
+    },
+    order_upper_end_text: {
+        backgroundColor: 'blue',
+        width: 90,
+        textAlign: 'center',
+        borderRadius: 50,
+    },
+    order_mid_info: {
+        // flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    order_mid_end_info: {
+        // backgroundColor: 'red',
+        justifyContent: 'space-between', 
+        // marginHorizontal: 10,
+        // paddingVertical: 20,
+        flex: 1,
+    },
+    order_lower_info: {
+        flex: 1, 
+        flexDirection: 'row', 
+        justifyContent: 'flex-end', 
+    },
 })

@@ -16,6 +16,8 @@ export default function BottomNavigation() {
             component={HomeScreen}
             options={{
                 tabBarLabel: 'Home',
+                tabBarActiveTintColor: 'darkgreen',
+                // tabBarActiveBackgroundColor: 'darkgreen',
                 headerShown: false,
                 tabBarIcon: ({focused}) => (
                     <Image source={focused ? require('../../../assets/home.png') : require('../../../assets/home-greyscale.png') } style={{width: 25, height: 25}}/>
@@ -26,6 +28,8 @@ export default function BottomNavigation() {
         <Tab.Screen name="Medicines"
             component={Medicines}
             options={{
+                tabBarLabel: 'Medicines',
+                tabBarActiveTintColor: 'darkgreen',
                 headerShown: false,
                 tabBarIcon: ({focused}) => (
                     <Image source={focused ? require('../../../assets/capsule.png') : require('../../../assets/capsule-greyscale.png') } style={{width: 25, height: 25}}/>
@@ -36,6 +40,7 @@ export default function BottomNavigation() {
             name="Clinics"
             component={Clinics}
             options={{
+                tabBarActiveTintColor: 'darkgreen',
                 headerShown: false,
                 tabBarIcon: ({focused}) => (
                     <Image source={focused ? require('../../../assets/clinic.png') : require('../../../assets/clinic-greyscale.png') } style={{width: 25, height: 25}}/>
@@ -46,6 +51,7 @@ export default function BottomNavigation() {
             name="Cart"
             component={Cart}
             options={{
+                tabBarActiveTintColor: 'darkgreen',
                 unmountOnBlur: true,
                 headerShown: false,
                 tabBarIcon: ({focused}) => (
@@ -57,6 +63,7 @@ export default function BottomNavigation() {
             name="Account"
             component={More}
             options={{
+                tabBarActiveTintColor: 'darkgreen',
                 headerShown: false,
                 tabBarIcon: ({focused}) => (
                     <Image source={focused ? require('../../../assets/man.png') : require('../../../assets/man-greyscale.png') } style={{width: 25, height: 25}}/>

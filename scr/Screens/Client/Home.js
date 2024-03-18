@@ -3,6 +3,7 @@ import React, {useContext, useState, useEffect} from 'react'
 import { AuthContext } from '../../context/AuthContext'
 import { BASE_URL, processResponse } from '../../config';
 import {LinearGradient} from 'expo-linear-gradient';
+import { StatusBar } from 'expo-status-bar';
 
 export default function Home() {
   const {userInfo} = useContext(AuthContext);
@@ -58,9 +59,11 @@ export default function Home() {
     getMerchants();
   },[])
   return (
+
     <View style={styles.container}>
-      <LinearGradient
-        colors={['transparent','#D0E7D2']}
+      <StatusBar hidden = {false} translucent = {true}/>
+      {/* <LinearGradient
+        colors={['transparent','#6EB95B']}
         style={{
           position: 'absolute',
           top: 0,
@@ -68,16 +71,16 @@ export default function Home() {
           right: 0,
           left: 0
         }}
-      />
+      /> */}
       <ScrollView>
-        <View style={{paddingHorizontal: 20, paddingTop: 20, paddingBottom: 10}}>
-          <Text style={{fontSize: 20, color: '#b2b2b2', marginBottom: 10}}>Hello {userInfo.details.first_name},</Text>
-          <Text style={{fontWeight: 'bold', fontSize: 32}}>Find your medicines</Text>
+        <View style={styles.main_header}>
+          <Text style={styles.header_user_text}>Hello <Text style={{fontWeight: 'bold'}}>{userInfo.details.first_name},</Text></Text>
+          <Text style={styles.header_user_subtext}>Find your medicines</Text>
         </View>
         <View style={{paddingHorizontal: 20, paddingVertical: 10}}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10}}>
-            <Text style={{fontSize: 20, color: '#b2b2b2'}}>Browse by category</Text>
-            <Text style={{fontSize: 20, color: '#585ce5', fontWeight: '700'}}>View all</Text>
+            <Text style={styles.sub_menus}>Browse by category</Text>
+            <Text style={styles.sub_menus_btn}>View all</Text>
           </View>
           <FlatList
             horizontal={true}
@@ -102,8 +105,8 @@ export default function Home() {
         </View>
         <View style={{paddingHorizontal: 20, paddingVertical: 10}}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10}}>
-            <Text style={{fontSize: 20, color: '#b2b2b2'}}>Browse by Pharma</Text>
-            <Text style={{fontSize: 20, color: '#585ce5', fontWeight: '700'}}>View all</Text>
+            <Text style={styles.sub_menus}>Browse by Pharma</Text>
+            <Text style={styles.sub_menus_btn}>View all</Text>
           </View>
           <FlatList
             horizontal={true}
@@ -137,6 +140,38 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff'
-  }
+    backgroundColor: '#fff',
+    // marginHorizontal: 20,
+  
+  },
+  main_header: {
+    backgroundColor: '#6EB95B',
+    paddingHorizontal: 20, 
+    paddingTop: '10%', 
+    paddingBottom: '10%',
+    elevation: 2,
+    shadowOffset: {width: 0, height: 100},
+    shadowOpacity: 5,
+    shadowRadius: 50,
+  },
+  header_user_text: {
+    marginTop: 10,
+    fontSize: 20, 
+    color: 'white', 
+  },
+  header_user_subtext: {
+    fontWeight: 'bold', 
+    fontSize: 32,
+    color: 'white',
+  },
+  sub_menus: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#B2B1B9'
+  },
+  sub_menus_btn: {
+    fontSize: 18, 
+    color: '#DDDDDD', 
+    fontWeight: 'bold',
+  },
 })

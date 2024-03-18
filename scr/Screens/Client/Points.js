@@ -44,7 +44,7 @@ export default function Points({navigation}) {
                             {transactions.length > 0 ?
                                     transactions.map((item, index) => {
                                         return (
-                                            <View key={index} style={{paddingHorizontal: 15, paddingVertical: 20, marginBottom: 10, flexDirection: 'row', borderRadius: 5, backgroundColor: '#fff', elevation: 5}}>
+                                            <View key={index} style={{paddingHorizontal: 15, paddingVertical: 20, marginBottom: 10, flexDirection: 'row', borderRadius: 10, backgroundColor: '#fff', elevation: 5}}>
                                                 <View style={{flex: 1}}>
                                                     <Text style={{fontWeight: 'bold'}}>{item.trans_details}</Text>
                                                     <Text style={{color: '#b2b2b2'}}>{item.trans_date}</Text>

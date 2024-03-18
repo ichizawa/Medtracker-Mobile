@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, SafeAreaView, TextInput, TouchableOpacity, Imag
 import React, { useContext, useEffect, useState } from 'react'
 import { BASE_URL, processResponse } from '../../config'
 import { AuthContext } from '../../context/AuthContext'
+import { StatusBar } from 'expo-status-bar';
 //alert('View uploaded prescription.')
 
 export default function Cart() {
@@ -29,7 +30,6 @@ export default function Cart() {
                 const {statusCode, data} = res;
                 let merchant_list = [];
                 if(statusCode === 200 && data.cart_items.length > 0) {
-                    //console.log(data.cart_items);
                     data.cart_items.map((item) => {
                         if(merchant_list.find(element => element === item.merchant_name) !== undefined) {
                             console.log('1 record found');
@@ -85,13 +85,11 @@ export default function Cart() {
                 .then(res => {
                     const {statusCode, data} = res;
                     const distance = (data.routes[0].distance / 1000).toFixed(1);
-                    //console.log(distance);
                     if(payment_method === 'COD') {
                         if(distance > 3) {
                             let fee = (distance - 3) * 12;
                             fee += 40;
                             merchant_list.map((item) => {
-                                console.log(item);
                                 fee += 10;
                             })
                             setServiceFee(parseFloat(fee.toFixed(2)));
@@ -107,9 +105,75 @@ export default function Cart() {
             }
         }
     }
-    const updateQuantity = (cart_id, quantity, price) => {
+    const updateQuantity = (cart_id, quantities, transaction) => {
+        let id = cart_id.includes(",") ? cart_id.split(",")[0] : cart_id;
+        let qty = quantities.includes(",") ? quantities.split(",")[0] : quantities;
+        if(transaction === 'add') {
+            qty = parseInt(qty) + 1;
+            try {
+                fetch(`${BASE_URL}cart/update-quantity/${id}/${qty}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${userInfo.token}`
+                    }
+                })
+                .then(processResponse)
+                .then(res => {
+                    const {statusCode, data} = res;
+                    if(statusCode === 200) {
+                        getCart(paymentMethod);
+                        alert(data.success);
+                    }
+                })
+            } catch (e) {
+                console.log(e);
+            }
+        } else if(transaction === 'minus') {
+            if(qty > 1) {
+                qty = parseInt(qty) - 1;
+                try {
+                    fetch(`${BASE_URL}cart/update-quantity/${id}/${qty}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${userInfo.token}`
+                        }
+                    })
+                    .then(processResponse)
+                    .then(res => {
+                        const {statusCode, data} = res;
+                        if(statusCode === 200) {
+                            getCart(paymentMethod);
+                            alert(data.success);
+                        }
+                    })
+                } catch (e) {
+                    console.log(e);
+                }
+            } else {
+                removeCartItem(id, cart_id.includes(","));
+            }
+        }
+    }
+    const getQuantities = (quantities) => {
+        let qtys;
+        let totalQuantity = 0;
+        if(quantities.includes(",")) {
+            qtys = quantities.split(",");
+        } else {
+            qtys = [quantities]
+        }
+        qtys.map((qty) => {
+            totalQuantity = parseInt(totalQuantity) + parseInt(qty);
+        })
+        return totalQuantity;
+    }
+    const removeCartItem = (cart_id, isUpdate) => {
         try {
-            fetch(`${BASE_URL}cart/update-quantity/${cart_id}/${quantity}/${price}`, {
+            fetch(`${BASE_URL}cart/remove-cart-by-id/${cart_id}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -120,20 +184,19 @@ export default function Cart() {
             .then(processResponse)
             .then(res => {
                 const {statusCode, data} = res;
-                if(statusCode === 200) {
-                    getCart(paymentMethod);
-                }
+                alert(isUpdate ? 'Quantity changed successfully' : data.msg);
+                getCart(paymentMethod);
             })
         } catch (e) {
             console.log(e);
         }
     }
     const checkOut = () => {
+        // alert(JSON.stringify(cartItem[0]))
         try {
             fetch(`${BASE_URL}transaction/add-order`, {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${userInfo.token}`
                 },
@@ -161,39 +224,40 @@ export default function Cart() {
     }
     const removeAllItems = () => {
         let ids = [];
-        const cart_id = cartItem.map((item) => {
+        const cart_id = cartItem && cartItem.map((item) => {
             return item.cart_ids
         })
-        cart_id.map((item) => {
-            //const id_s = item.spit(',')
-            if(item.length > 0) {
-                let splitString = item.split(',');
-                splitString.map((id) => {
-                    ids.push(id);
+        if(cart_id !== null) {
+            cart_id.map((item) => {
+                //const id_s = item.spit(',')
+                if(item.length > 0) {
+                    let splitString = item.split(',');
+                    splitString.map((id) => {
+                        ids.push(id);
+                    })
+                }
+            })
+            try {
+                fetch(`${BASE_URL}cart/remove-all-cart`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${userInfo.token}`
+                    },
+                    body: JSON.stringify({
+                        cart_id: ids
+                    })
                 })
+                .then(processResponse)
+                .then(res => {
+                    const {statusCode, data} = res;
+                    getCart(paymentMethod);
+                    setPrescriptionRequired(0);
+                })
+            } catch (e) {
+                console.log(e);
             }
-        })
-        try {
-            fetch(`${BASE_URL}cart/remove-all-cart`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${userInfo.token}`
-                },
-                body: JSON.stringify({
-                    cart_id: ids
-                })
-            })
-            .then(processResponse)
-            .then(res => {
-                const {statusCode, data} = res;
-                getCart(paymentMethod);
-                console.log(data)
-                setPrescriptionRequired(0);
-            })
-        } catch (e) {
-            console.log(e);
         }
     }
     const getCurrentDateTime = () => {
@@ -228,9 +292,12 @@ export default function Cart() {
     }
     useEffect(() => {
         getCart(paymentMethod);
+        //console.log(userInfo)
     }, [])
     return (
         <SafeAreaView style={styles.container}>
+            {/* <StatusBar></StatusBar> */}
+            <StatusBar hidden = {false} translucent = {true}/>
             <View style={styles.header}>
                 <View style={styles.menu_button}/>
                 <Text style={styles.header_title}>My Cart</Text>
@@ -238,7 +305,7 @@ export default function Cart() {
                     style={styles.menu_button}
                     onPress={() => removeAllItems()}
                 >
-                    <Image source={require('../../../assets/trash.png')} style={{width: '100%', height: '100%', resizeMode: 'contain', tintColor: '#ff0000'}}/>
+                    <Image source={require('../../../assets/trash.png')} style={{width: '100%', height: '100%', resizeMode: 'contain', tintColor: '#C7C8CC'}}/>
                 </TouchableOpacity>
             </View>
             <View style={{flex: 1}}>
@@ -256,7 +323,8 @@ export default function Cart() {
                                             <View style={{flex: 1, marginLeft: 10}}>
                                                 <View style={{flex: 1, flexDirection: 'row'}}>
                                                     <View style={{flex: 1, justifyContent: 'center', paddingRight: 50}}>
-                                                        <Text numberOfLines={1} ellipsizeMode='tail'>{item.name}</Text>
+                                                        <Text numberOfLines={1} ellipsizeMode='tail' style={{fontWeight: 'bold'}}>{item.name}</Text>
+                                                        <Text numberOfLines={1} ellipsizeMode='tail'>{item.merchant_name}</Text>
                                                     </View>
                                                     <View style={{width: 30}}>
                                                         {item.is_prescription_required === 1 ?
@@ -271,15 +339,15 @@ export default function Cart() {
                                                         <TouchableOpacity
                                                             underlayColor={'#fff'}
                                                             style={{width: 20, height: 20}}
-                                                            onPress={() => updateQuantity(item.id, (item.quantity - 1), item.price)}
+                                                            onPress={() => updateQuantity(item.cart_ids, item.quantities, 'minus')}
                                                         >
                                                             <Image source={require('../../../assets/minus-circle.png')} style={{resizeMode: 'contain', width: '100%', height: '100%', tintColor: '#79AC78'}}/>
                                                         </TouchableOpacity>
-                                                        <TextInput editable={false} style={{marginHorizontal: 5, textAlign: 'center'}} value={item.id === cartItem[index].id ? cartItem[index].total_quantity.toString() : "1"}/>
+                                                        <TextInput editable={false} style={{marginHorizontal: 5, textAlign: 'center'}} value={item.id === cartItem[index].id ? getQuantities(cartItem[index].quantities).toString() : "1"}/>
                                                         <TouchableOpacity
                                                             underlayColor={'#fff'}
                                                             style={{width: 20, height: 20}}
-                                                            onPress={() => updateQuantity(item.id, (item.quantity + 1), item.price)}
+                                                            onPress={() => updateQuantity(item.cart_ids, item.quantities, 'add')}
                                                         >
                                                             <Image source={require('../../../assets/add.png')} style={{resizeMode: 'contain', width: '100%', height: '100%', tintColor: '#79AC78'}}/>
                                                         </TouchableOpacity>
@@ -296,9 +364,6 @@ export default function Cart() {
                         />
                     :
                         null
-                }
-                {merchants &&
-                    <Text>{merchants}</Text>
                 }
             </View>
             <View style={{
@@ -333,8 +398,8 @@ export default function Cart() {
                         <Text  style={{fontSize: 18, fontWeight: 'bold'}}>Select Payment Method</Text>
                     </View>
                     <View style={{flexDirection: 'row'}}>
-                        <ToggleButton type={'COD'} activeColor={'#79AC78'} orderType={'Delivery'} typeDescripton='Cash On Delivery' typeSubDescription={'For Delivery'} customStyle={{borderWidth: 1, paddingHorizontal: 15, paddingVertical: 10, borderRadius: 5, marginRight: 10}}/>
-                        <ToggleButton type={'COP'} activeColor={'#79AC78'} orderType={'Pickup'} typeDescripton='Cash On Pickup' typeSubDescription={'For Pickup'} customStyle={{borderWidth: 1, paddingHorizontal: 15, paddingVertical: 10, borderRadius: 5}}/>
+                        <ToggleButton type={'COD'} activeColor={'#79AC78'} orderType={'Delivery'} typeDescripton='Cash On Delivery' typeSubDescription={'For Delivery'} customStyle={{borderWidth: 1, paddingHorizontal: 15, paddingVertical: 10, borderRadius: 10, marginRight: 10}}/>
+                        <ToggleButton type={'COP'} activeColor={'#79AC78'} orderType={'Pickup'} typeDescripton='Cash On Pickup' typeSubDescription={'For Pickup'} customStyle={{borderWidth: 1, paddingHorizontal: 15, paddingVertical: 10, borderRadius: 10}}/>
                     </View>
                 </View>
                 <View style={{borderTopWidth: 1, borderColor: '#f3f3f3', backgroundColor: '#fff'}}>
@@ -358,7 +423,7 @@ export default function Cart() {
                     style={{backgroundColor: cartItem !== null && paymentMethod !== null ? (cartItem.length > 0 ? '#79AC78' : '#b2b2b2') : '#b2b2b2', width: '100%', height: 50, alignItems: 'center', justifyContent: 'center'}}
                     onPress={() => checkOut()}
                 >
-                    <Text style={{color: '#fff'}}>Checkout</Text>
+                    <Text style={{fontSize: 16,color: '#fff', fontWeight: 'bold'}}>Checkout</Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
@@ -369,18 +434,19 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#fff'
+        backgroundColor: '#fff',
+        // paddingTop: '10%',
     },
     header:{
+        elevation: 5,
+        paddingHorizontal: '5%',
         flexDirection: 'row',
-        width: '100%',
-        backgroundColor: '#fff',
-        paddingBottom: 20,
+        backgroundColor: '#6EB95B',
+        height: '12%',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderBottomWidth: 5,
-        borderBottomColor: '#f1f2f3',
-        paddingHorizontal: 10
+        paddingTop: '10%'
+        // paddingTop: 10,
     },
     menu_button: {
         height: 30,
@@ -399,8 +465,9 @@ const styles = StyleSheet.create({
         tintColor: '#87b5eb'
     },
     header_title: {
-        fontSize: 18,
-        fontWeight: 'bold'
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: 'white'
     },
     product_title: {
         fontSize: 14,
@@ -421,7 +488,7 @@ const styles = StyleSheet.create({
         width: '100%',
         //height: 45,
         backgroundColor: '#f1f2f3',
-        borderRadius: 5,
+        borderRadius: 10,
         paddingHorizontal: 15,
         paddingVertical: 10
     },

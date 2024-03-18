@@ -4,6 +4,7 @@ import { BASE_URL, processResponse } from '../../config'
 import { AuthContext } from '../../context/AuthContext'
 import SelectDropdown from 'react-native-select-dropdown'
 import * as ImagePicker from 'expo-image-picker'
+import { StatusBar } from 'expo-status-bar'
 
 const window_width = Dimensions.get('window').width
 
@@ -119,7 +120,8 @@ export default function EditItem({route, navigation}) {
     }, [])
     return (
         <View style={styles.container}>
-            <ScrollView  style={{flexGrow: 1, backgroundColor: '#fff'}} automaticallyAdjustKeyboardInsets={true}>
+            <StatusBar hidden = {false} translucent = {true}/>
+            <ScrollView style={{flexGrow: 1, backgroundColor: '#fff'}} automaticallyAdjustKeyboardInsets={true}>
                 <View style={styles.header}>
                     <TouchableOpacity
                     underlayColor={'#fff'}
@@ -178,8 +180,8 @@ export default function EditItem({route, navigation}) {
                                 onPress={() => pickImage()}
                             >
                                 <>
-                                    <Image source={require('../../../assets/circle-camera.png')} style={{width: 35, height: 35, tintColor: '#99DFB2', marginBottom: 10}}/>
-                                    <Text style={{fontWeight: 'bold', color: '#99DFB2'}}>Upload Image</Text>
+                                    <Image source={require('../../../assets/circle-camera.png')} style={{width: 35, height: 35, tintColor: 'darkgreen', marginBottom: 10}}/>
+                                    <Text style={{fontSize: 15,fontWeight: 'bold', color: 'darkgreen'}}>Upload Image</Text>
                                 </>
                             </TouchableOpacity>
                         </View>
@@ -199,10 +201,10 @@ export default function EditItem({route, navigation}) {
                                 id: categoryId,
                                 desc: categoryName
                             }}
-                            buttonStyle={{height: 45, marginVertical: 15, width: '100%', borderRadius: 5, paddingHorizontal: 20}}
+                            buttonStyle={{height: 45, marginVertical: 15, width: '100%', borderRadius: 10, paddingHorizontal: 20}}
                             buttonTextStyle={{textAlign: 'left', color: '#000', fontSize: 14, marginLeft: 0}}
                             defaultButtonText='Select Category'
-                            dropdownStyle={{borderRadius: 5}}
+                            dropdownStyle={{borderRadius: 10}}
                             renderDropdownIcon={(isOpened) => {
                                 return (
                                     <Image source={isOpened ? require('../../../assets/angle-up.png') : require('../../../assets/angle-down.png')} style={{width: 15, height: 15}}/>
@@ -270,7 +272,7 @@ export default function EditItem({route, navigation}) {
                 style={{
                     width: '100%',
                     height: 50,
-                    backgroundColor: '#585ce5',
+                    backgroundColor: 'darkgreen',
                     alignItems: 'center',
                     justifyContent: 'center'
                 }}
@@ -296,6 +298,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         alignItems: 'center',
         justifyContent: 'space-between',
+        paddingTop: '13%'
     },
     menu_button: {
         height: 20,
@@ -345,7 +348,7 @@ const styles = StyleSheet.create({
         width: '100%',
         //height: 45,
         backgroundColor: '#f1f2f3',
-        borderRadius: 5,
+        borderRadius: 10,
         marginVertical: 15,
         paddingHorizontal: 15,
         paddingVertical: 10
@@ -353,7 +356,7 @@ const styles = StyleSheet.create({
     multiline_input: {
         width: '100%',
         backgroundColor: '#f1f2f3',
-        borderRadius: 5,
+        borderRadius: 10,
         marginVertical: 15,
         padding: 15,
         textAlignVertical: 'top'

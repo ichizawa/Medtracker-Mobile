@@ -2,6 +2,8 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, Platform, Sa
 import React, { useContext, useEffect, useState } from 'react'
 import { BASE_URL, processResponse } from '../../config';
 import { AuthContext } from '../../context/AuthContext';
+import { LinearGradient } from 'expo-linear-gradient'
+import { StatusBar } from 'expo-status-bar';
 
 export default function Items({navigation}) {
     const {userInfo} = useContext(AuthContext);
@@ -35,6 +37,7 @@ export default function Items({navigation}) {
     }, [])
     return (
         <SafeAreaView style={styles.container}>
+            <StatusBar hidden = {false} translucent = {true}/>
             <View style={styles.header}>
                 <TouchableOpacity
                 underlayColor={'#fff'}
@@ -53,8 +56,19 @@ export default function Items({navigation}) {
                 >
                 <Image source={require('../../../assets/search.png')} style={styles.menu_icon_right}/>
                 </TouchableOpacity>
+                
             </View>
             <View style={{flex: 1, padding: 10, backgroundColor: '#f2f2f2'}}>
+            <LinearGradient
+                colors={['transparent','lightgreen']}
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    right: 0,
+                    left: 0
+                }}
+            />
                 {data ?
                         <FlatList
                             data={data}
@@ -111,7 +125,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: '100%',
-        backgroundColor: '#fff'
+        backgroundColor: '#fff',
+        paddingTop: 20
     },
     header:{
         paddingBottom: 20,
@@ -121,10 +136,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         alignItems: 'center',
         justifyContent: 'space-between',
+        paddingTop: '7%'
     },
     menu_button: {
         height: 30,
         width: 30,
+        // color: '#6EB95B'
     },
     menu_icon_right: {
         width: '80%',
@@ -135,7 +152,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         resizeMode: 'contain',
-        tintColor: '#87b5eb'
+        tintColor: 'black'
     },
     header_title: {
         fontSize: 18,
@@ -150,10 +167,10 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 30,
         right: 30,
-        backgroundColor: '#99DFB2',
+        backgroundColor: '#6EB95B',
         width: 70,
         height: 70,
-        borderRadius: 35,
+        borderRadius: 15,
         alignItems: 'center',
         justifyContent: 'center',
     }

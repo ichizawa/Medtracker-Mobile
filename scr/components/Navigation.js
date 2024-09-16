@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, {useContext} from 'react'
-import { NavigationContainer } from '@react-navigation/native'
+import { NavigationContainer, StackActions } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { AuthContext } from '../context/AuthContext'
 import Login from '../Login'
@@ -26,6 +26,11 @@ import RiderPoints from '../Screens/Rider/Points'
 import ClientPoints from '../Screens/Client/Points'
 import TermsAndConditions from '../Screens/TermsAndConditions'
 import PrivacyPolicy from '../Screens/PrivacyPolicy'
+import MedicineDetails from '../Screens/Client/MedicineDetails'
+import MedDetails from '../Screens/Client/MedicineDetails'
+import BrowseCategory from '../Screens/Client/BrowseCategory'
+import BrowseMedicine from '../Screens/Client/BrowseMedicine'
+import BrowsePharma from '../Screens/Client/BrowsePharma'
 
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +50,10 @@ export default function Navigation() {
                                         <Stack.Screen name='ClientOrderDetails' component={ClientOrderDetails} options={{headerShown: false}}/>
                                         <Stack.Screen name='ClientProfile' component={ClientProfile} options={{headerShown: false}}/>
                                         <Stack.Screen name='ClientPoints' component={ClientPoints} options={{headerShown: false}}/>
+                                        <Stack.Screen name='MedicineDetails' component={MedDetails} options={{headerShown: false}}/>
+                                        <Stack.Screen name='BrowseCategory' component={BrowseCategory} options={{headerShown: false}}/>
+                                        <Stack.Screen name='BrowseMedicine' component={BrowseMedicine} options={{headerShown: false}}/>
+                                        <Stack.Screen name='BrowsePharma' component={BrowsePharma} options={{headerShown: false}}/>
                                     </>
                                 :
                                     null
@@ -70,6 +79,7 @@ export default function Navigation() {
                                         <Stack.Screen name='EditItem' component={MerchantEditItem} options={{headerShown: false}}/>
                                         <Stack.Screen name='MerchantOrderDetails' component={MerchantOrderDetails} options={{headerShown: false}}/>
                                         <Stack.Screen name='MerchantPoints' component={MerchantPoints} options={{headerShown: false}}/>
+
                                     </>
                                 :
                                     null

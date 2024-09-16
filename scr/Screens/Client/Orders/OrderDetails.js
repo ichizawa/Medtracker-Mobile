@@ -56,6 +56,7 @@ export default function OrderDetails({route, navigation}) {
                     <View style={[styles.upper_main_container]}>
                         <Text style={styles.text_col}>Your Order is being prepared</Text>
                         <Text style={styles.text_col}>Delivery attempt should be completed by </Text>
+                        <Text style={styles.text_col}>This orders service fee: P100.00 </Text>
                     </View>
                 </View>
 
@@ -118,8 +119,8 @@ export default function OrderDetails({route, navigation}) {
                                         <View style={[styles.inter_text, {width: '80%', flexDirection: 'row', justifyContent: 'space-between'}]}>
                                             <Text style={styles.order_text}>Total Price</Text>
                                             <Text>{'\u20B1' + calculateTotalPrice(item.items)}</Text>
-                                            
                                         </View>
+                                        
                                     </View>
 
 
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
         elevation: 15,
     },
     upper_main_container: {
-        height: 60,
+        height: 70,
         justifyContent: 'space-around'
     },
     text_col: {

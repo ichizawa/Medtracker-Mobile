@@ -91,7 +91,7 @@ export default function AcceptedOrders({navigation}) {
                                             {item.order.map((product, index) => {
                                                 return (
                                                     <View key={'order'+index}>
-                                                        {product.items.map((item, index) => {
+                                                        {product.items.slice(0,1).map((item, index) => {
                                                             return (
                                                                 <Text key={'product'+item.product_id} numberOfLines={1} ellipsizeMode='tail' style={{color: 'black', fontSize: 14, fontWeight: 'bold'}}>{item.product_name}</Text>
                                                             )
@@ -104,6 +104,12 @@ export default function AcceptedOrders({navigation}) {
                                     
                                     <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 10, justifyContent: 'flex-end', marginTop: 0}}>
                                         <Text style={{fontSize: 14, marginRight: 10, color: 'black'}}>Total Bill:</Text>
+                                        <Text style={{fontSize: 14, color: '#013237'}}>
+                                            { '\u20B1' + getTotal(item.order)}
+                                        </Text>
+                                    </View>
+                                    <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 10, justifyContent: 'flex-end', marginTop: 0}}>
+                                        <Text style={{fontSize: 14, marginRight: 10, color: 'black'}}>Service Fee:</Text>
                                         <Text style={{fontSize: 14, color: '#013237'}}>
                                             { '\u20B1' + getTotal(item.order)}
                                         </Text>
@@ -150,7 +156,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#C0E6BA',
         width: '95%',
-        height: 170,
+        height: 180,
         borderRadius: 10,
         marginBottom: 25,
         padding: 13

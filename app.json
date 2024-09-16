@@ -2,12 +2,12 @@
   "expo": {
     "name": "MedTracker",
     "slug": "MedTracker",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/mt_icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/mt_icon.png",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
@@ -19,16 +19,16 @@
       "bundleIdentifier": "com.mediaone.MedTracker"
     },
     "android": {
+      "versionCode": 5,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/mt_icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.mediaone.MedTracker",
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.FOREGROUND_SERVICE",
-        "android.permission.ACCESS_BACKGROUND_LOCATION"
+        "android.permission.FOREGROUND_SERVICE"
       ]
     },
     "web": {
@@ -46,7 +46,7 @@
         "expo-location",
         {
           "locationWhenInUsePermission": "Show current location on map.",
-          "isAndroidBackgroundLocationEnabled": true
+          "isAndroidBackgroundLocationEnabled": false
         }
       ]
     ],

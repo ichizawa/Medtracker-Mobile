@@ -22,9 +22,10 @@ export const AuthProvider = ({children}) => {
             .then(res => {
                 const {statusCode, data} = res;
                 // console.log(statusCode);
-                // console.log(data);
+                 console.log(data);
                 if(statusCode === 200) {
                     setUserInfo(data);
+
                 }else {
                     alert(data.error);
                 }
@@ -49,18 +50,22 @@ export const AuthProvider = ({children}) => {
                     email: email,
                     password: password,
                     user_type: 1, //1 customer, 2 merchant, 3 rider
-                    first_name: '',
-                    last_name: '',
-                    middle_name: '',
-                    contact_no: '',
+                    first_name: 'test',
+                    last_name: 'test',
+                    middle_name: 'test',
+                    contact_no: '0000',
                     address: '',
-                    lat: '',
-                    long: '',
+                    lat: '0000',
+                    long: '0000',
                 })
             })
             .then(processResponse)
             .then(res => {
                 const {statusCode, data} = res;
+                if(statusCode === 200) {
+                    alert(JSON.stringify(data));
+                }
+                console.log(data);
             })
             .catch((e) => console.log(e))
         } catch (e) {
@@ -96,7 +101,8 @@ export const AuthProvider = ({children}) => {
         <AuthContext.Provider value={{
             login,
             logout,
-            userInfo
+            userInfo,
+            register
         }}>{children}</AuthContext.Provider>
     )
 }

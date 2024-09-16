@@ -4,11 +4,14 @@ import { AuthContext } from '../../context/AuthContext'
 import { BASE_URL, processResponse } from '../../config';
 import {LinearGradient} from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
+import { TouchableOpacity } from 'react-native';
 
-export default function Home() {
+export default function Home({navigation}) {
   const {userInfo} = useContext(AuthContext);
   const [categoryList, setCategoryList] = useState([]);
   const [pharmacyList, setPharmacyList] = useState([]);
+  const [itemList, setItemList] = useState([]);
+
   const getCategories = () => {
     try {
         fetch(`${BASE_URL}category-list`, {
@@ -54,24 +57,35 @@ export default function Home() {
     let color = Math.random().toString(16).substr(-6);
     return `#${color}`;
   };
+
+  const getItems = () => {
+    try {
+      fetch(`${BASE_URL}product-list`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      })
+        .then(processResponse)
+        .then((res) => {
+          const { statusCode, data } = res;
+          setItemList(data.result);
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  
   useEffect(() => {
     getCategories();
     getMerchants();
+    getItems();
   },[])
   return (
 
     <View style={styles.container}>
       <StatusBar hidden = {false} translucent = {true}/>
-      {/* <LinearGradient
-        colors={['transparent','#6EB95B']}
-        style={{
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          right: 0,
-          left: 0
-        }}
-      /> */}
       <ScrollView>
         <View style={styles.main_header}>
           <Text style={styles.header_user_text}>Hello <Text style={{fontWeight: 'bold'}}>{userInfo.details.first_name},</Text></Text>
@@ -80,7 +94,12 @@ export default function Home() {
         <View style={{paddingHorizontal: 20, paddingVertical: 10}}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10}}>
             <Text style={styles.sub_menus}>Browse by category</Text>
-            <Text style={styles.sub_menus_btn}>View all</Text>
+            <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("BrowseCategory");
+            }}>
+              <Text style={styles.sub_menus_btn}>View all</Text>
+            </TouchableOpacity>
           </View>
           <FlatList
             horizontal={true}
@@ -106,7 +125,12 @@ export default function Home() {
         <View style={{paddingHorizontal: 20, paddingVertical: 10}}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10}}>
             <Text style={styles.sub_menus}>Browse by Pharma</Text>
-            <Text style={styles.sub_menus_btn}>View all</Text>
+            <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("BrowsePharma");
+            }}>
+              <Text style={styles.sub_menus_btn}>View all</Text>
+            </TouchableOpacity>
           </View>
           <FlatList
             horizontal={true}
@@ -128,10 +152,43 @@ export default function Home() {
                     <Text numberOfLines={1} ellipsizeMode='tail' style={{color: '#b2b2b2'}}>{item.address}</Text>
                   </View>
                 </View>
+                
               )
             }}
           />
         </View>
+        <View>
+  <View style={{paddingHorizontal: 20, paddingVertical: 10}}>
+    <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10}}>
+      <Text style={styles.sub_menus}>Keep Discovering</Text>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("BrowseMedicine");
+        }}>
+          <Text style={styles.sub_menus_btn}>View all</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+  <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 20 }}>
+    {itemList.map((item, index) => {
+      return (
+        <View key={index} style={{ width: '50%', paddingHorizontal: 5, marginBottom: 10 }}>
+          <View style={{ height: 180, borderRadius: 10, backgroundColor: useGenerateRandomColor(), justifyContent: 'space-between' }}>
+            <View style={{ padding: 20 }}>
+              {/* Medicine name at the bottom of the card */}
+              <Text numberOfLines={2} ellipsizeMode='tail' style={{ color: '#fff', fontSize: 18, textShadowColor: 'red', textShadowColor: 'rgba(0, 0, 0, 0.75)', textShadowOffset: { width: -1, height: 1 }, textShadowRadius: 10 }}>{item.name}</Text>
+            </View>
+            <View style={{ paddingHorizontal: 20, paddingBottom: 10 }}>
+              {/* "Price: " label */}
+              <Text style={{ color: '#fff', fontSize: 14 }}>Price: {item.price}</Text>
+            </View>
+          </View>
+        </View>
+      )
+    })}
+  </View>
+</View>
+
       </ScrollView>
     </View>
   )

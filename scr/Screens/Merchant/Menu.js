@@ -117,7 +117,7 @@ export default function Menu({navigation}) {
                         style={styles.menu_options}
                         onPressIn={()=>focusedPoints(true)}
                         onPressOut={()=>focusedPoints(false)}
-                        onPress={() => alert('Being worked on.')}>
+                        onPress={() => navigation.navigate('MerchantPoints')}>
                         <View style={[styles.btn_txt, {flexDirection: 'row', alignItems: 'center', width: '100%'}]}>
                             <FontAwesome style={{ fontSize: 25,color: isPointsFocused ? 'white' : '#013237' }} name='credit-card' />
                             <View style={styles.btn_int_txt}>

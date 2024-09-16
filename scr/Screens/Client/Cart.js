@@ -4,6 +4,8 @@ import { BASE_URL, processResponse } from '../../config'
 import { AuthContext } from '../../context/AuthContext'
 import { StatusBar } from 'expo-status-bar';
 //alert('View uploaded prescription.')
+import * as ImagePicker from 'expo-image-picker'
+import SyncStorage from 'sync-storage';
 
 export default function Cart() {
     const {userInfo} = useContext(AuthContext);
@@ -12,9 +14,28 @@ export default function Cart() {
     const [orderType, setOrderType] = useState('Delivery');
     const [serviceFee, setServiceFee] = useState(40.00);
     //const [mapPoints, setMapPoints] = useState([]);
+    const [image, setImage] = useState(null);
+    const [prescriptionUploaded, setPrescriptionUploaded] = useState(false);
+
     const [storeFee, setStoreFee] = useState(0);
     const [merchants, setMerchants] = useState([]);
     const [prescriptionRequired, setPrescriptionRequired] = useState(0);
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            base64: true,
+            aspect: [1, 1],
+            quality: 0.8,
+        });
+        if (!result.canceled) {
+            setImage('data:image/webp;base64,'+result.assets[0].base64);
+            setPrescriptionUploaded(true);
+        } else {
+            console.log('canceled');
+        }
+    }
     const getCart = async (payment_method) => {
         try {
             await fetch(`${BASE_URL}cart/cart-item`, {
@@ -29,8 +50,11 @@ export default function Cart() {
             .then(res => {
                 const {statusCode, data} = res;
                 let merchant_list = [];
+                let itemsInCart = [];
                 if(statusCode === 200 && data.cart_items.length > 0) {
                     data.cart_items.map((item) => {
+                        // itemsInCart.push(item);
+
                         if(merchant_list.find(element => element === item.merchant_name) !== undefined) {
                             console.log('1 record found');
                         } else {
@@ -41,6 +65,8 @@ export default function Cart() {
                             setPrescriptionRequired(item.is_prescription_required);
                         }
                     })
+                    // SyncStorage.set('itemsInCart', JSON.stringify(itemsInCart));
+                    
                     setMerchants(merchant_list);
                     setCartItem(data.cart_items);
                     getStorePoints(data.cart_items, payment_method, merchant_list);
@@ -185,6 +211,12 @@ export default function Cart() {
             .then(res => {
                 const {statusCode, data} = res;
                 alert(isUpdate ? 'Quantity changed successfully' : data.msg);
+
+                const itemToRemove = cartItem.find(item => item.cart_ids === cart_id);
+                if (itemToRemove && itemToRemove.is_prescription_required === 1) {
+                    setPrescriptionRequired(prevState => prevState - 1);
+                }
+
                 getCart(paymentMethod);
             })
         } catch (e) {
@@ -303,7 +335,7 @@ export default function Cart() {
                 <Text style={styles.header_title}>My Cart</Text>
                 <TouchableOpacity
                     style={styles.menu_button}
-                    onPress={() => removeAllItems()}
+                    onPress={() => {removeAllItems()}}
                 >
                     <Image source={require('../../../assets/trash.png')} style={{width: '100%', height: '100%', resizeMode: 'contain', tintColor: '#C7C8CC'}}/>
                 </TouchableOpacity>
@@ -387,7 +419,7 @@ export default function Cart() {
                             <TouchableOpacity onPress={() => alert('View uploaded prescription.')}>
                                 <Image source={require('../../../assets/eye.png')} style={{resizeMode: 'contain', width: 25, height: 25, tintColor: '#2dc4f4'}}/>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => alert('Upload prescription.')} style={{marginLeft: 20}}>
+                            <TouchableOpacity onPress={() => pickImage()} style={{marginLeft: 20}}>
                                 <Image source={require('../../../assets/note-medical.png')} style={{resizeMode: 'contain', width: 25, height: 25, tintColor: '#2dc4f4'}}/>
                             </TouchableOpacity>
                         </View>
@@ -417,10 +449,22 @@ export default function Cart() {
                     </View>
                 </View>
                 <TouchableOpacity
-                    disabled={cartItem !== null && paymentMethod !== null ? (cartItem.length > 0 ? false : true) : true}
+                // cartItem !== null && paymentMethod !== null ? (cartItem.length > 0 ? false : true) : true
+                // cartItem !== null && paymentMethod !== null ? (cartItem.length > 0 ? '#79AC78' : '#b2b2b2') : '#b2b2b2', 
+                // checkOut()
+                    disabled={ 
+                        (prescriptionRequired === 1 && !prescriptionUploaded) ||
+                        (cartItem !== null && paymentMethod !== null ? (cartItem.length > 0 ? false : true) : true)
+                    }
                     underlayColor={'#f1f2f3'}
                     activeOpacity={0.2}
-                    style={{backgroundColor: cartItem !== null && paymentMethod !== null ? (cartItem.length > 0 ? '#79AC78' : '#b2b2b2') : '#b2b2b2', width: '100%', height: 50, alignItems: 'center', justifyContent: 'center'}}
+                    style={{
+                        backgroundColor: (prescriptionRequired === 1 && !prescriptionUploaded) || cartItem === null || paymentMethod === null ? '#b2b2b2' : (cartItem.length > 0 ? '#79AC78' : '#b2b2b2'),
+                        width: '100%', 
+                        height: 50, 
+                        alignItems: 'center', 
+                        justifyContent: 'center'
+                    }}
                     onPress={() => checkOut()}
                 >
                     <Text style={{fontSize: 16,color: '#fff', fontWeight: 'bold'}}>Checkout</Text>

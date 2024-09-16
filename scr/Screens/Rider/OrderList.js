@@ -23,40 +23,119 @@ export default function OrderList({navigation}) {
         .then(processResponse)
         .then(res => {
             const {statusCode, data} = res;
-            console.log(data.accepted_order)
             setOrders(data.accepted_order)
         })
     } catch (e) {
         console.log(e);
     }
   }
-  const takeOrder = (order_id) => {
+  const userOrdersTake = (order_id) => {
+  console.log(userInfo.details.id);
+      console.log(order_id);
+      try {
+          fetch(`${BASE_URL}rider/assigned-order/${order_id}`, {
+              method: 'GET',
+              headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${userInfo.token}`
+              }
+          })
+          .then(processResponse)
+          .then(res => {
+              const {statusCode, data} = res;
+              console.log(data)
+              orderList();
+          })
+      } catch (e) {
+          console.log(e);
+      }
+  }
+  const takeOrder = (items, order_id ) => {
+    let totalItems = 0;
+    items.order.map((items) => {
+      items.items.map((item) => {
+        totalItems += parseFloat(item.transaction_price);
+      });
+    });
+
     try {
-        fetch(`${BASE_URL}rider/assigned-order/${order_id}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${userInfo.token}`
-            }
-        })
+      fetch(`${BASE_URL}rider/check-cart-points/${userInfo.details.user_id}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userInfo.token}`,
+        }
+      })
         .then(processResponse)
-        .then(res => {
-            const {statusCode, data} = res;
-            console.log(data)
-            orderList();
-        })
+        .then((res) => {
+          const { statusCode, data } = res;
+          if(statusCode === 200){
+            if(data.result !== null && data.result.current_points >= totalItems){
+              const rider_totalPTS = data.result.current_points;
+
+              checkoutController(rider_totalPTS, items, order_id, totalItems);
+
+            }else{
+              alert('Not enough points');
+            }
+          }
+        });
+    } catch (e) {
+      console.log(e);
+    }
+   
+  }
+
+  const checkoutController = async (riderpts, orders, order_id, totalprice) => {
+    try {
+        await fetch(`${BASE_URL}rider/pay-merchant-points`, {
+            method: "POST",
+            headers: {
+                'Accept': "application/json",
+                'Content-Type': "application/json",
+                'Authorization': `Bearer ${userInfo.token}`,
+            },
+            body: JSON.stringify({
+                order_specs: orders.order.map((merchant) => {
+                    return {
+                        merchant_name: merchant.merchant_name,
+                        items: merchant.items.map((item) => {
+                            return {
+                                product_id: item.product_id,
+                                product_name: item.product_name,
+                                product_price: item.product_price,
+                                product_quantity: item.product_quantity,
+                                transaction_price: item.transaction_price
+                            }
+                        })
+                    }
+                }),
+                order_id: order_id,
+                rider_totalPTS: riderpts,
+                total_price: totalprice
+            })
+          })
+            .then(processResponse)
+            .then((res) => {
+                const { statusCode, data } = res;
+                console.log(data.result);
+                userOrdersTake(order_id);
+                alert('Order Successfully Accepted!');
+        });
     } catch (e) {
         console.log(e);
     }
-  }
+}
+
   const getTotal = (items) => {
     //console.log(items);
     let total = 0
     items.map((merchant) => {
       merchant.items.map((item) => {
         //console.log(item.transaction_price);
-        total += parseFloat(item.transaction_price)
+        total += parseFloat(item.transaction_price);
       })
     })
     return total.toFixed(2);
@@ -154,6 +233,9 @@ export default function OrderList({navigation}) {
                               <View style={{alignItems: 'flex-end', marginVertical: 0}}>
                                 <Text style={{color: '#013237', fontSize: 14, fontWeight: 'bold'}}>Total Bll: { '\u20B1' + getTotal(item.order)}</Text>
                               </View>
+                              <View style={{alignItems: 'flex-end', marginVertical: 0}}>
+                              <Text style={{color: '#013237', fontSize: 14, fontWeight: 'bold'}}>Service fee: ₱100.00</Text>
+                              </View>
                               <View style={{flex: 1, flexDirection: 'row', width: '100%', paddingTop: 10}}>
                                 <View style={{flex:1}}/>
                                 <TouchableOpacity
@@ -165,7 +247,10 @@ export default function OrderList({navigation}) {
                                       borderRadius: 10,
                                       backgroundColor: item.status === 'Accepted' ? '#0766AD' : '#b2b2b2'
                                   }}
-                                  onPress={() => takeOrder(item.order_no)}
+                                  onPress={() => {
+                                    // console.log(item)
+                                    takeOrder(item, item.order_no);
+                                  }}
                                 >
                                     <Text style={{color: '#fff', fontWeight: 'bold'}}>Take Order</Text>
                                 </TouchableOpacity>

@@ -90,18 +90,18 @@ export default function PendingOrders({navigation}) {
                                             </View>
                                         </View>
                                         <View style={styles.order_mid_info}>
-                                            <View style={styles.order_mid_end_info}>
-                                                {item.order.map((product, index) => {
-                                                    return (
-                                                        <View key={'order'+index}>
-                                                            {product.items.map((item, index) => {
-                                                                return (
-                                                                    <Text key={'product'+item.product_id} numberOfLines={1} ellipsizeMode='tail' style={{color: 'black', fontSize: 13, fontWeight: 'bold'}}>{item.product_name}</Text>
-                                                                )
-                                                            })}
-                                                        </View>
-                                                    )
-                                                })}
+                                        <View style={styles.order_mid_end_info}>
+                                            {item.order.map((product, index) => {
+                                                return (
+                                                    <View key={'order'+index}>
+                                                        {product.items.slice(0,1).map((item, index) => { // Use slice(0, 2) to get only the first two items
+                                                            return (
+                                                                <Text key={'product'+item.product_id} numberOfLines={1} ellipsizeMode='tail' style={{color: 'black', fontSize: 13, fontWeight: 'bold'}}>{item.product_name}</Text>
+                                                            )
+                                                        })}
+                                                    </View>
+                                                )
+                                             })}
                                             </View>
                                         </View>
                                         <View style={styles.order_lower_info}>
@@ -224,6 +224,7 @@ const styles = StyleSheet.create({
         
     },
     order_lower_info: {
+        marginTop: 10,
         flex: 1, 
         flexDirection: 'row', 
         // paddingHorizontal: 10, 

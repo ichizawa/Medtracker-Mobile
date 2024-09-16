@@ -125,7 +125,7 @@ export default function NewOrders({navigation}) {
                                      <View style={styles.order_lower_heading}>
                                          <View style={{width: 35, height: '100%'}}/>
                                             <View style={styles.order_lower_sub_heading}>
-                                             {item.items.map((product, index) => {
+                                             {item.items.slice(0,1).map((product, index) => {
                                                 return (
                                                     <Text key={index} numberOfLines={1} ellipsizeMode='tail' style={{marginVertical: 3, fontWeight: 'bold', color: '#013237'}}>{product.product_name}</Text>
                                                 )

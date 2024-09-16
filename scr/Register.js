@@ -9,13 +9,16 @@ const window_height = Dimensions.get('window').height;
 
 
 export default function Register({navigation}) {
-    // const {register} = useContext(AuthContext);
+    const {register} = useContext(AuthContext);
 
     const [isFnameFocussed, sestFnameFocused] = useState(false);
     const [isLnameFocused, setLnameFocused] = useState(false);
     const [isEmailFocused, setEmailFocused] = useState(false);
     const [isPasswordFocused, setPasswordFocused] = useState(false);
     const [isConfirmPassFocused, setConfiirmPassFocussed] = useState(false);
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     return (
         <ScrollView style={{flexGrow: 1, backgroundColor: '#fff'}} automaticallyAdjustKeyboardInsets={true}>
@@ -50,6 +53,7 @@ export default function Register({navigation}) {
                         onFocus={() => setEmailFocused(true)}
                         onBlur={() => setEmailFocused(false)}
                         placeholder='USERNAME / EMAIL'
+                        onChangeText={(e) => setEmail(e)}
                     />
                 </View>
                 <View>
@@ -59,6 +63,7 @@ export default function Register({navigation}) {
                         onFocus={() => setPasswordFocused(true)}
                         onBlur={() => setPasswordFocused(false)}
                         placeholder='PASSWORD'
+                        onChangeText={(e) => setPassword(e)}
                     />
                 </View>
                 <View>
@@ -75,7 +80,7 @@ export default function Register({navigation}) {
                 <TouchableOpacity
                     activeOpacity={0.8}
                     style={styles.auth_button}
-                    // onPress={() => register(email, password)}
+                    onPress={() => {register(email, password); navigation.navigate("Login")}}
                     >
                     <Text style={styles.auth_button_text}>REGISTER</Text>
                 </TouchableOpacity>

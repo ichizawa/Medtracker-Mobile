@@ -11,7 +11,14 @@ const Tab = createBottomTabNavigator();
 
 export default function BottomNavigation() {
   return (
-    <Tab.Navigator screenOptions={{tabBarHideOnKeyboard: true}}>
+    <Tab.Navigator screenOptions={{
+      tabBarHideOnKeyboard: true,
+      tabBarStyle: {
+        height: 60,
+        backgroundColor: 'white',
+        paddingVertical: 10,
+      },
+    }}>
         <Tab.Screen name="ClientHome"
             component={HomeScreen}
             options={{
@@ -20,7 +27,7 @@ export default function BottomNavigation() {
                 // tabBarActiveBackgroundColor: 'darkgreen',
                 headerShown: false,
                 tabBarIcon: ({focused}) => (
-                    <Image source={focused ? require('../../../assets/home.png') : require('../../../assets/home-greyscale.png') } style={{width: 25, height: 25}}/>
+                    <Image source={focused? require('../../../assets/home.png') : require('../../../assets/home-greyscale.png') } style={{width: 35, height: 35}}/>
                 ),
                 unmountOnBlur: true
             }}
@@ -32,7 +39,7 @@ export default function BottomNavigation() {
                 tabBarActiveTintColor: 'darkgreen',
                 headerShown: false,
                 tabBarIcon: ({focused}) => (
-                    <Image source={focused ? require('../../../assets/capsule.png') : require('../../../assets/capsule-greyscale.png') } style={{width: 25, height: 25}}/>
+                    <Image source={focused? require('../../../assets/capsule.png') : require('../../../assets/capsule-greyscale.png') } style={{width: 35, height: 35}}/>
                 ),
             }}
         />
@@ -43,7 +50,7 @@ export default function BottomNavigation() {
                 tabBarActiveTintColor: 'darkgreen',
                 headerShown: false,
                 tabBarIcon: ({focused}) => (
-                    <Image source={focused ? require('../../../assets/clinic.png') : require('../../../assets/clinic-greyscale.png') } style={{width: 25, height: 25}}/>
+                    <Image source={focused? require('../../../assets/clinic.png') : require('../../../assets/clinic-greyscale.png') } style={{width: 35, height: 35}}/>
                 ),
             }}
         />
@@ -55,7 +62,7 @@ export default function BottomNavigation() {
                 unmountOnBlur: true,
                 headerShown: false,
                 tabBarIcon: ({focused}) => (
-                    <Image source={focused ? require('../../../assets/shopping-cart.png') : require('../../../assets/shopping-cart-greyscale.png') } style={{width: 25, height: 25}}/>
+                    <Image source={focused? require('../../../assets/shopping-cart.png') : require('../../../assets/shopping-cart-greyscale.png') } style={{width: 35, height: 35}}/>
                 ),
             }}
         />
@@ -66,7 +73,7 @@ export default function BottomNavigation() {
                 tabBarActiveTintColor: 'darkgreen',
                 headerShown: false,
                 tabBarIcon: ({focused}) => (
-                    <Image source={focused ? require('../../../assets/man.png') : require('../../../assets/man-greyscale.png') } style={{width: 25, height: 25}}/>
+                    <Image source={focused? require('../../../assets/man.png') : require('../../../assets/man-greyscale.png') } style={{width: 35, height: 35}}/>
                 ),
             }}
         />

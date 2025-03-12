@@ -1,5 +1,6 @@
 // export const BASE_URL = 'http://192.168.110.24:8000/medtrack/';
-export const BASE_URL = 'https://medtrackerph.com/api/medtrack/';
+export const BASE_URL = 'http://192.168.110.116:8000/medtrack/';
+// export const BASE_URL = 'https://medtrackerph.com/api/medtrack/';
 export const processResponse = async (response) => { 
     try{
         const statusCode = response.status;                 //

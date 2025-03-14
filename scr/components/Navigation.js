@@ -31,7 +31,8 @@ import MedDetails from '../Screens/Client/MedicineDetails'
 import BrowseCategory from '../Screens/Client/BrowseCategory'
 import BrowseMedicine from '../Screens/Client/BrowseMedicine'
 import BrowsePharma from '../Screens/Client/BrowsePharma'
-
+import OtcCat from '../Screens/Client/OtcCategory'
+import Clinic from '../Screens/Client/RhoaPharma'
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
@@ -54,6 +55,8 @@ export default function Navigation() {
                                         <Stack.Screen name='BrowseCategory' component={BrowseCategory} options={{headerShown: false}}/>
                                         <Stack.Screen name='BrowseMedicine' component={BrowseMedicine} options={{headerShown: false}}/>
                                         <Stack.Screen name='BrowsePharma' component={BrowsePharma} options={{headerShown: false}}/>
+                                        <Stack.Screen name='OtcCategory' component={OtcCat} options={{headerShown: false}}/>
+                                        <Stack.Screen name='RhoaPharma' component={Clinic} options={{headerShown: false}}/>
                                     </>
                                 :
                                     null

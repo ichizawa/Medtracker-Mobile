@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, ScrollView, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, TextInput, ScrollView, TouchableOpacity, SafeAreaView, } from 'react-native'
 import { FontAwesome } from "@expo/vector-icons";
 import React from 'react'
 
@@ -52,7 +52,7 @@ export default function BrowseCategory({navigation}) {
               </View>
               <Text style={styles.card_title}>Category 4</Text>
               <Text style={styles.card_description}>This is the description for card 4.</Text>
-            </View>
+            </View> 
           </View>
           <View style={styles.card_row}>
             <View style={styles.card}>

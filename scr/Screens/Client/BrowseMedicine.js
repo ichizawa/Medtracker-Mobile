@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 100 },
     shadowOpacity: 5,
     shadowRadius: 50,
-    flexDirection: 'row', // Added flexDirection for proper alignment
-    alignItems: 'center', // Centered items vertically
+    flexDirection: 'row', 
+    alignItems: 'center', 
   },
   header_user_text: {
     fontSize: 20,
@@ -137,10 +137,11 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   gridItem: {
-    width: '48%', // Adjust this value to your preference for spacing
+    width: '48%', 
     marginBottom: 15,
   },
   backButton: {
-    marginRight: 20, // Added margin for spacing
+    marginRight: 20,
   },
+  
 });

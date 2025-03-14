@@ -3,8 +3,12 @@ import React, {useEffect, useState, useContext} from 'react'
 import {BASE_URL, processResponse}  from '../config'
 import { AuthContext } from '../context/AuthContext'
 import { WebView } from 'react-native-webview'
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+
 
 export default function TermsAndConditions({navigation}) {
+  const SafeProvider =  SafeAreaProvider;
   const {userInfo} = useContext(AuthContext);
   const [termsAndConditions, setTermsAndConditions] = useState(null);
 
@@ -32,28 +36,31 @@ export default function TermsAndConditions({navigation}) {
     getTnC();
   }, [])
   return (
+    <SafeProvider>
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-          <TouchableOpacity
+        <TouchableOpacity
           underlayColor={'#fff'}
           activeOpacity={0.2}
           style={styles.menu_button}
           onPress={() => navigation.goBack()}
-          >
-          <Image source={require('../../assets/angle-left.png')} style={styles.menu_icon}/>
-          </TouchableOpacity>
-          <Text style={styles.header_title}>Terms & Conditions</Text>
-          <View style={styles.menu_button}/>
+        >
+          <Image source={require('../../assets/angle-left.png')} style={styles.menu_icon} />
+        </TouchableOpacity>
+        <Text style={styles.header_title}>Terms & Conditions</Text>
+        <View style={styles.menu_button} />
       </View>
-      {termsAndConditions &&
+      {termsAndConditions && (
         <WebView
           //style={styles.container}
           automaticallyAdjustContentInsets={false}
           originWhitelist={['*']}
-          source={{ html:  termsAndConditions}}
+          source={{ html: termsAndConditions }}
         />
-      }
+      )}
     </SafeAreaView>
+  </SafeProvider>
+  
   )
 }
 
@@ -74,6 +81,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       borderBottomColor: '#f2f2f2',
       borderBottomWidth: 5,
+      paddingTop: '13%'
   },
   menu_button: {
       height: 20,
